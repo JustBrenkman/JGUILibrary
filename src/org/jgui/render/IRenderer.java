@@ -29,21 +29,34 @@
  *
  */
 
-package org.jgui;
+package org.jgui.render;
 
-import org.jgui.render.Display;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
+/**
+ * Created by ben on 25/08/14.
+ */
+public interface IRenderer {
 
-public class JGUILibrary {
+    public void renderImage();
 
-    public static void main(String[] args) {
-        Display display = new Display();
+    public void initialize();
 
-        display.create();
+    public void renderLine();
 
-        System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
-    }
+    public void renderRectangle();
 
+    public void renderTriangle();
 
+    public void renderCircle();
+
+    public void renderArray();
+
+    public void setFrameBuffer();
+
+    public void renderMesh();
+
+    public void clearBuffers();
+
+    public void uploadVBO();
+
+    public void shutDown();
 }

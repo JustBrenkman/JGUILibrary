@@ -29,21 +29,71 @@
  *
  */
 
-package org.jgui;
+package org.jgui.render;
 
-import org.jgui.render.Display;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.ContextAttribs;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.PixelFormat;
 
-public class JGUILibrary {
+public class Display {
 
-    public static void main(String[] args) {
-        Display display = new Display();
+    public static final int defaultWidth = 800;
+    public static final int defaultHeight = 600;
 
-        display.create();
+    public boolean fullscreen = false;
 
-        System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+    private String title = "Window";
+
+    public Display() {
+
     }
 
+    public void Display(boolean full) {
+        this.fullscreen = full;
+    }
 
+    public void create() {
+        try {
+            PixelFormat pixelFormat = new PixelFormat();
+            ContextAttribs contextAtrributes = new ContextAttribs(3, 2);
+            org.lwjgl.opengl.Display.setDisplayMode(new DisplayMode(defaultWidth, defaultHeight));
+
+            org.lwjgl.opengl.Display.create(pixelFormat);
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clear() {
+
+    }
+
+    public void destroy() {
+        org.lwjgl.opengl.Display.destroy();
+    }
+
+    public void update() {
+        org.lwjgl.opengl.Display.update();
+    }
+
+    public void sync(int sync) {
+        org.lwjgl.opengl.Display.sync(sync);
+    }
+
+    public void setRenderer() {
+
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public boolean isCloseRequested() {
+        return org.lwjgl.opengl.Display.isCloseRequested();
+    }
 }

@@ -31,19 +31,53 @@
 
 package org.jgui;
 
-import org.jgui.render.Display;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
-public class JGUILibrary {
+import javax.swing.*;
 
-    public static void main(String[] args) {
-        Display display = new Display();
+/**
+ * Created by ben on 25/08/14.
+ */
+public class Start {
+    private JComboBox comboBox1;
+    private JLabel Width;
+    private JButton startButton;
+    private JPanel mainPanel;
+    private JLabel label;
+    private JComboBox combobox1;
 
-        display.create();
-
-        System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        getDisplayLists();
     }
 
+    public int[][] getDisplayLists() {
 
+        DisplayMode[] modes;
+
+        try {
+            modes = Display.getAvailableDisplayModes();
+
+            for (int i = 0; i < modes.length; i++) {
+                comboBox1.addItem(modes[i].getWidth() + " x " + modes[i].getHeight());
+            }
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Start");
+        frame.setContentPane(new Start().mainPanel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+
+    }
 }

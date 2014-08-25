@@ -29,21 +29,47 @@
  *
  */
 
-package org.jgui;
+package org.jgui.core;
 
 import org.jgui.render.Display;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
 
-public class JGUILibrary {
+public class JGUI {
 
-    public static void main(String[] args) {
-        Display display = new Display();
+    Display display;
 
-        display.create();
-
-        System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+    public JGUI() {
+        display = new Display();
     }
 
+    public void intitialize() {
+        display.create();
+    }
 
+    public void registerWindow() {
+
+    }
+
+    public void registerApplication() {
+
+    }
+
+    public void startApplication(String name) {
+
+    }
+
+    /**
+     * Careful this is the last method that you can call
+     *
+     * Calls render methods
+     */
+    public void start() {
+        mainLoop();
+    }
+
+    public void mainLoop() {
+        while (true) {
+            display.sync(60);
+            display.update();
+        }
+    }
 }
