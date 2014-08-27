@@ -44,6 +44,8 @@ public class MeshData {
     private List<Color> colors = new ArrayList<>();
     private List<Byte> indecies = new ArrayList<>();
 
+    private float[] verticies;
+
     private VertexBufferObject vbo;
 
     public void addVertex(Vertex2f vertex2f) {
@@ -57,9 +59,11 @@ public class MeshData {
     }
 
     public void addVerticies(float... v) {
-        for (int i = 0; i < v.length; i += 2) {
-            vertices.add(new Vertex2f(v[i / 2], v[(i / 2) + 1]));
-        }
+//        for (int i = 0; i < v.length; i += 2) {
+//            vertices.add(new Vertex2f(v[i / 2], v[(i / 2) + 1]));
+//        }
+
+        verticies = v;
     }
 
     /**
@@ -70,6 +74,10 @@ public class MeshData {
         for (int i = 0; i < c.length; i += 4) {
             colors.add(new Color(c[i], c[(i) + 1], c[(i) + 2], c[(i) + 3]));
         }
+    }
+
+    public void addColor(Color col) {
+        colors.add(col);
     }
 
     public float[] getColors() {
@@ -118,7 +126,12 @@ public class MeshData {
             System.out.println("" + ver[i] + ", " + ver[i + 1]);
         }
 
-        return ver;
+        if (vertices != null) {
+//        return ver;
+            return verticies;
+        } else {
+            return ver;
+        }
     }
 
     public List<Vertex2f> getVertices() {

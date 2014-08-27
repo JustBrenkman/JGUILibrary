@@ -38,6 +38,8 @@ import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
 import org.jgui.util.PathManager;
 
+import java.awt.*;
+
 public class JGUI {
 
     Display display;
@@ -88,9 +90,11 @@ public class JGUI {
 
         Mesh mesh = new Mesh();
 
-//        mesh.getMesh().addVerticies(new Vertex2f(-0.5f, 0.5f), new Vertex2f(-0.5f, -0.5f), new Vertex2f(0.5f, -0.5f), new Vertex2f(0.5f, -0.5f), new Vertex2f(0.5f, 0.5f), new Vertex2f(-0.5f, 0.5f));
         mesh.getMesh().addVerticies(-0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f);
-        mesh.getMesh().addColors(1f, 0f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f);
+        mesh.getMesh().addColor(new Color(0x2D89EF));
+        mesh.getMesh().addColor(new Color(0x2D89EF));
+        mesh.getMesh().addColor(new Color(0x2D89EF));
+        mesh.getMesh().addColor(new Color(0x2D89EF));
         byte[] indecies = {0, 1, 2, 2, 3, 0};
         mesh.getMesh().addIndecies(indecies);
 
@@ -100,13 +104,25 @@ public class JGUI {
         shader.loadShaders();
         shader.compile();
 
+        Mesh box = new Mesh();
+        box.getMesh().addVerticies(-0.2f, 0.2f, -0.2f, -0.2f, 0.2f, -0.2f, 0.2f, 0.2f);
+        box.getMesh().addColor(new Color(0x00A300));
+        box.getMesh().addColor(new Color(0x00A300));
+        box.getMesh().addColor(new Color(0x00A300));
+        box.getMesh().addColor(new Color(0x00A300));
+        byte[] boxi = {0, 1, 2, 2, 3, 0};
+        box.getMesh().addIndecies(boxi);
+        box.getMesh().compile();
+
         while (!display.isCloseRequested()) {
 
-            OpenGLRenderer.clear();
+            display.clear();
 
             renderer.renderMesh(mesh, shader);
 
-            org.lwjgl.opengl.Display.update();
+            renderer.renderMesh(box, shader);
+
+            display.update();
         }
 
         display.destroy();
