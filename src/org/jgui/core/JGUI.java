@@ -31,18 +31,32 @@
 
 package org.jgui.core;
 
+import org.jgui.mesh.Mesh;
 import org.jgui.render.Display;
+import org.jgui.render.IRenderer;
+import org.jgui.render.OpenGLRenderer;
+import org.jgui.render.Shader;
+import org.jgui.util.PathManager;
 
 public class JGUI {
 
     Display display;
 
+    private IRenderer renderer;
+
     public JGUI() {
         display = new Display();
+
+        renderer = new OpenGLRenderer();
+
+        PathManager.getInstance();
+        PathManager.initialize();
     }
 
     public void intitialize() {
         display.create();
+        renderer.initialize();
+//        renderer.clearBuffers();
     }
 
     public void registerWindow() {
@@ -57,6 +71,10 @@ public class JGUI {
 
     }
 
+    public IRenderer getRenderer() {
+        return renderer;
+    }
+
     /**
      * Careful this is the last method that you can call
      *
@@ -66,10 +84,31 @@ public class JGUI {
         mainLoop();
     }
 
-    public void mainLoop() {
-        while (true) {
-            display.sync(60);
-            display.update();
+    private void mainLoop() {
+
+        Mesh mesh = new Mesh();
+
+//        mesh.getMesh().addVerticies(new Vertex2f(-0.5f, 0.5f), new Vertex2f(-0.5f, -0.5f), new Vertex2f(0.5f, -0.5f), new Vertex2f(0.5f, -0.5f), new Vertex2f(0.5f, 0.5f), new Vertex2f(-0.5f, 0.5f));
+        mesh.getMesh().addVerticies(-0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f);
+        mesh.getMesh().addColors(1f, 0f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f);
+        byte[] indecies = {0, 1, 2, 2, 3, 0};
+        mesh.getMesh().addIndecies(indecies);
+
+        mesh.getMesh().compile();
+
+        Shader shader = new Shader("vs.glsl", "fs.glsl");
+        shader.loadShaders();
+        shader.compile();
+
+        while (!display.isCloseRequested()) {
+
+            OpenGLRenderer.clear();
+
+            renderer.renderMesh(mesh, shader);
+
+            org.lwjgl.opengl.Display.update();
         }
+
+        display.destroy();
     }
 }

@@ -31,10 +31,17 @@
 
 package org.jgui.render;
 
-/**
- * Created by ben on 25/08/14.
- */
+import org.jgui.mesh.Mesh;
+import org.lwjgl.opengl.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.lwjgl.opengl.GL11.*;
+
 public class OpenGLRenderer implements IRenderer {
+
+    private Logger logger = LoggerFactory.getLogger(OpenGLRenderer.class);
+
     @Override
     public void renderImage() {
 
@@ -42,7 +49,10 @@ public class OpenGLRenderer implements IRenderer {
 
     @Override
     public void initialize() {
+        glClearColor(43f / 255f, 43f / 255f, 43f / 255f, 0f);
+        glViewport(0, 0, Display.defaultWidth, Display.defaultHeight);
 
+        logger.info("Initialized OpenGL");
     }
 
     @Override
@@ -66,7 +76,7 @@ public class OpenGLRenderer implements IRenderer {
     }
 
     @Override
-    public void renderArray() {
+    public void renderVBO() {
 
     }
 
@@ -76,13 +86,34 @@ public class OpenGLRenderer implements IRenderer {
     }
 
     @Override
-    public void renderMesh() {
+    public void renderMesh(Mesh mesh, Shader shader) {
 
+        shader.bind();
+
+        GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
+
+        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+
+        GL30.glBindVertexArray(0);
+
+        shader.unBind();
     }
 
     @Override
     public void clearBuffers() {
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
+    public static void clear() {
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     @Override
@@ -92,6 +123,16 @@ public class OpenGLRenderer implements IRenderer {
 
     @Override
     public void shutDown() {
+
+    }
+
+    @Override
+    public void enableScissor(int x, int y, int width, int height) {
+
+    }
+
+    @Override
+    public void disableScissor() {
 
     }
 }

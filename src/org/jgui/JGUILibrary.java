@@ -31,19 +31,26 @@
 
 package org.jgui;
 
-import org.jgui.render.Display;
-import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
+import org.jgui.core.JGUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JGUILibrary {
 
+    public static JGUI gui = new JGUI();
+
+    static Logger logger = LoggerFactory.getLogger(JGUILibrary.class);
+
     public static void main(String[] args) {
-        Display display = new Display();
-
-        display.create();
-
-        System.out.println("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+        start();
     }
 
+    public static void start() {
+        gui.intitialize();
 
+        logger.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+
+        gui.start();
+    }
 }

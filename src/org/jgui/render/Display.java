@@ -34,7 +34,10 @@ package org.jgui.render;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Display {
 
@@ -45,8 +48,10 @@ public class Display {
 
     private String title = "Window";
 
-    public Display() {
+    Logger logger;
 
+    public Display() {
+        logger = LoggerFactory.getLogger(Display.class);
     }
 
     public void Display(boolean full) {
@@ -56,17 +61,21 @@ public class Display {
     public void create() {
         try {
             PixelFormat pixelFormat = new PixelFormat();
-            ContextAttribs contextAtrributes = new ContextAttribs(3, 2);
+            ContextAttribs contextAtrributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true);
             org.lwjgl.opengl.Display.setDisplayMode(new DisplayMode(defaultWidth, defaultHeight));
+            org.lwjgl.opengl.Display.setTitle("JGUI");
+            org.lwjgl.opengl.Display.create(pixelFormat, contextAtrributes);
 
-            org.lwjgl.opengl.Display.create(pixelFormat);
+            GL11.glViewport(0, 0, defaultWidth, defaultHeight);
+
+            logger.info("Created Display: " + defaultWidth + " X " + defaultHeight);
         } catch (LWJGLException e) {
             e.printStackTrace();
         }
     }
 
     public void clear() {
-
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
     }
 
     public void destroy() {
@@ -81,9 +90,9 @@ public class Display {
         org.lwjgl.opengl.Display.sync(sync);
     }
 
-    public void setRenderer() {
-
-    }
+//    public void setRenderer(IRenderer irenderer) {
+//
+//    }
 
     public String getTitle() {
         return title;

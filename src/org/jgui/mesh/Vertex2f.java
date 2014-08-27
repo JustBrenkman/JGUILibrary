@@ -29,42 +29,40 @@
  *
  */
 
-package org.jgui.render;
-
-import org.jgui.mesh.Mesh;
+package org.jgui.mesh;
 
 /**
- * Created by ben on 25/08/14.
+ * Created by ben on 26/08/14.
  */
-public interface IRenderer {
+public class Vertex2f {
 
-    public void initialize();
+    public Vertex2f(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
 
-    public void renderImage();
+    public Vertex2f() {
+        x = 0;
+        y = 0;
+    }
 
-    public void renderLine();
+    private float x;
 
-    public void renderRectangle();
+    private float y;
 
-    public void renderTriangle();
+    public float getX() {
+        return x;
+    }
 
-    public void renderCircle();
+    public void setX(float x) {
+        this.x = x;
+    }
 
-    public void renderVBO();
+    public float getY() {
+        return y;
+    }
 
-    public void setFrameBuffer();
-
-    public void renderMesh(Mesh mesh, Shader shader);
-
-    public void clearBuffers();
-
-    public void uploadVBO();
-
-    public void shutDown();
-
-    public void enableScissor(int x, int y, int width, int height);
-
-    public void disableScissor();
-
-//    public void setInternalResolution();
+    public void setY(float y) {
+        this.y = y;
+    }
 }
