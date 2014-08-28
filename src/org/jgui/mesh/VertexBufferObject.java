@@ -65,6 +65,9 @@ public class VertexBufferObject {
 
     private ByteBuffer indexBuffer;
 
+    // Random Coolness buffer ID
+    private int rcoID;
+
     public VertexBufferObject(float[] vertices, float[] colors, byte[] indecies) {
         setVertices(vertices);
         setIndecies(indecies);
@@ -157,6 +160,8 @@ public class VertexBufferObject {
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
+        randomCoolness();
+
         // Bind to buffer 0
         GL30.glBindVertexArray(0);
 
@@ -168,6 +173,22 @@ public class VertexBufferObject {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, iboID);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    private void randomCoolness() {
+
+        float[] color = {1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1};
+
+        FloatBuffer colorB = BufferUtils.createFloatBuffer(color.length);
+        colorB.put(color);
+        colorB.flip();
+
+        rcoID = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, rcoID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorB, GL15.GL_STATIC_DRAW);
+
+        GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
     public void updateBuffer() {}

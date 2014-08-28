@@ -88,8 +88,6 @@ public class MeshData {
             ver[i + 1] = colors.get(i / 4).getGreen() / 255f;
             ver[i + 2] = colors.get(i / 4).getBlue() / 255f;
             ver[i + 3] = colors.get(i / 4).getAlpha() / 255f;
-
-            System.out.println("" + ver[i] + ", " + ver[i + 1] + ", " + ver[i + 2] + ", " + ver[i + 3]);
         }
 
         return ver;
@@ -110,7 +108,6 @@ public class MeshData {
 
         for (int i = 0; i < indecies.size(); i++) {
             in[i] = indecies.get(i);
-            System.out.println(in[i]);
         }
 
         return in;
@@ -122,8 +119,6 @@ public class MeshData {
         for (int i = 0; i < ver.length; i += 2) {
             ver[i] = vertices.get(i / 2).getX();
             ver[i + 1] = vertices.get(i / 2).getY();
-
-            System.out.println("" + ver[i] + ", " + ver[i + 1]);
         }
 
         if (vertices != null) {

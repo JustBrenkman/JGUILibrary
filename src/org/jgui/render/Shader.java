@@ -80,6 +80,7 @@ public class Shader {
 
         GL20.glBindAttribLocation(programID, 0, "in_Position");
         GL20.glBindAttribLocation(programID, 1, "in_Color");
+        GL20.glBindAttribLocation(programID, 2, "random_color");
 
         GL20.glLinkProgram(programID);
 

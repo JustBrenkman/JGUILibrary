@@ -93,6 +93,7 @@ public class OpenGLRenderer implements IRenderer {
         GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
 
@@ -101,6 +102,7 @@ public class OpenGLRenderer implements IRenderer {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
 
         GL30.glBindVertexArray(0);
 
@@ -123,7 +125,7 @@ public class OpenGLRenderer implements IRenderer {
 
     @Override
     public void shutDown() {
-
+        // TODO destroy everything
     }
 
     @Override
