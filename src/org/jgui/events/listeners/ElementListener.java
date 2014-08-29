@@ -29,42 +29,14 @@
  *
  */
 
-package org.jgui.render;
+package org.jgui.events.listeners;
 
-import org.jgui.render.mesh.Mesh;
+import org.jgui.events.Event;
 
 /**
- * Created by ben on 25/08/14.
+ * Created by ben on 28/08/14.
  */
-public interface IRenderer {
+public interface ElementListener {
 
-    public void initialize();
-
-    public void renderImage();
-
-    public void renderLine();
-
-    public void renderRectangle();
-
-    public void renderTriangle();
-
-    public void renderCircle();
-
-    public void renderVBO();
-
-    public void setFrameBuffer();
-
-    public void renderMesh(Mesh mesh, Shader shader);
-
-    public void clearBuffers();
-
-    public void uploadVBO();
-
-    public void shutDown();
-
-    public void enableScissor(int x, int y, int width, int height);
-
-    public void disableScissor();
-
-//    public void setInternalResolution();
-}
+    public void event(Event event);
+ }

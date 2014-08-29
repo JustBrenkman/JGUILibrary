@@ -29,42 +29,10 @@
  *
  */
 
-package org.jgui.render;
-
-import org.jgui.render.mesh.Mesh;
+package org.jgui.scene;
 
 /**
- * Created by ben on 25/08/14.
+ * Created by ben on 28/08/14.
  */
-public interface IRenderer {
-
-    public void initialize();
-
-    public void renderImage();
-
-    public void renderLine();
-
-    public void renderRectangle();
-
-    public void renderTriangle();
-
-    public void renderCircle();
-
-    public void renderVBO();
-
-    public void setFrameBuffer();
-
-    public void renderMesh(Mesh mesh, Shader shader);
-
-    public void clearBuffers();
-
-    public void uploadVBO();
-
-    public void shutDown();
-
-    public void enableScissor(int x, int y, int width, int height);
-
-    public void disableScissor();
-
-//    public void setInternalResolution();
+public class Scene {
 }

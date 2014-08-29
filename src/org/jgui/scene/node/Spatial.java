@@ -29,20 +29,44 @@
  *
  */
 
-package org.jgui.mesh;
+package org.jgui.scene.node;
+
+import org.jgui.scene.transform.Transform;
 
 /**
- * Created by ben on 26/08/14.
+ * Created by ben on 28/08/14.
  */
-public class Mesh {
+public class Spatial {
 
-    private MeshData mesh;
+    private Node parentNode;
 
-    public Mesh() {
-        mesh = new MeshData();
+    private String sceneName;
+
+    private Transform localTransform;
+
+    private Transform globalTransform;
+
+    public Spatial() {
     }
 
-    public MeshData getMesh() {
-        return mesh;
+    public Spatial(String name) {
+        this();
+        this.sceneName = name;
+    }
+
+    public Node getParentNode() {
+        return parentNode;
+    }
+
+    public void setParentNode(Node parentNode) {
+        this.parentNode = parentNode;
+    }
+
+    public String getSceneName() {
+        return sceneName;
+    }
+
+    public void setSceneName(String sceneName) {
+        this.sceneName = sceneName;
     }
 }

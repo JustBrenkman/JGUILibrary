@@ -29,7 +29,7 @@
  *
  */
 
-package org.jgui.mesh;
+package org.jgui.render.mesh;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -47,6 +47,8 @@ public class MeshData {
     private float[] verticies;
 
     private VertexBufferObject vbo;
+
+    private boolean flagDirty = true;
 
     public void addVertex(Vertex2f vertex2f) {
         vertices.add(vertex2f);

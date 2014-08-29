@@ -31,12 +31,17 @@
 
 package org.jgui.core;
 
-import org.jgui.mesh.Mesh;
+import org.jgui.render.mesh.Mesh;
 import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
+import org.jgui.scene.transform.Transform;
+import org.jgui.util.Camera;
 import org.jgui.util.PathManager;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
 
@@ -88,10 +93,17 @@ public class JGUI {
 
     private void mainLoop() {
 
+        Camera camera = new Camera();
+        camera.init();
+        camera.getTransform().updateTransformation();
+
         Mesh mesh = new Mesh();
 
-        mesh.getMesh().addVerticies(-0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f);
-        mesh.getMesh().addColor(new Color(0x2D89EF));
+        Transform t = new Transform();
+        t.setTranslation(new Vector3f(0.1f, 0, -2f));
+
+        mesh.getMesh().addVerticies(-1, -1, 0, 1, 1, -1);
+        mesh.getMesh().addColor(new Color(0x2d89ef));
         mesh.getMesh().addColor(new Color(0x2D89EF));
         mesh.getMesh().addColor(new Color(0x2D89EF));
         mesh.getMesh().addColor(new Color(0x2D89EF));
@@ -104,23 +116,49 @@ public class JGUI {
         shader.loadShaders();
         shader.compile();
 
-        Mesh box = new Mesh();
-        box.getMesh().addVerticies(-0.2f, 0.2f, -0.2f, -0.2f, 0.2f, -0.2f, 0.2f, 0.2f);
-        box.getMesh().addColor(new Color(0x00A300));
-        box.getMesh().addColor(new Color(0x00A300));
-        box.getMesh().addColor(new Color(0x00A300));
-        box.getMesh().addColor(new Color(0x00A300));
-        byte[] boxi = {0, 1, 2, 2, 3, 0};
-        box.getMesh().addIndecies(boxi);
-        box.getMesh().compile();
+        shader.addUniform("uniformFloat");
+        shader.addUniform("modelMatrix");
+        shader.addUniform("projectionMatrix");
+        shader.addUniform("viewMatrix");
+
+        org.lwjgl.opengl.DisplayMode[] modes = new org.lwjgl.opengl.DisplayMode[0];
+        try {
+            modes = org.lwjgl.opengl.Display.getAvailableDisplayModes();
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
+
+        for (int i=0;i<modes.length;i++) {
+            org.lwjgl.opengl.DisplayMode current = modes[i];
+            System.out.println(current.getWidth() + "x" + current.getHeight() + "x" +
+                    current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
+        }
+
+        float temp = 0;
+
+        try {
+            Mouse.create();
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
 
         while (!display.isCloseRequested()) {
 
             display.clear();
 
-            renderer.renderMesh(mesh, shader);
+            temp += 0.1f;
 
-            renderer.renderMesh(box, shader);
+            t.setTranslation(new Vector3f(((float) Mouse.getX() / org.lwjgl.opengl.Display.getWidth()) * 2 - 1, ((float)Mouse.getY() / Display.defaultHeight) * 2 - 1, 0));
+            t.updateTransformation();
+
+            shader.bind();
+            shader.updateUniformf("uniformFloat", (float) Math.abs(Math.sin(temp)));
+            shader.updateUniformMatrix4("modelMatrix", t.getModelMatrix());
+            shader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+            shader.unBind();
+
+            renderer.renderMesh(mesh, shader);
 
             display.update();
         }

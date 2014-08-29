@@ -29,71 +29,64 @@
  *
  */
 
-package org.jgui.util;
+package org.jgui.manager.layout;
 
-import org.jgui.scene.transform.Transform;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-
-import java.nio.FloatBuffer;
+import org.jgui.scene.node.Spatial;
+import org.lwjgl.util.vector.Vector2f;
 
 /**
- * Created by ben on 27/08/14.
+ * Created by ben on 28/08/14.
  */
-public class Camera {
+public class LayoutElement extends Spatial {
 
-    private Transform transform = new Transform();
+    private float paddingAll, paddingV, paddingH;
 
-    private Matrix4f projectionMatrix = new Matrix4f();
+    private Vector2f size;
 
-    private float fov = 60f;
-
-    private float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
-
-    float near_plane = 0.1f;
-
-    float far_plane = 100f;
-
-    float y_scale = this.coTangent(this.degreesToRadians(fov / 2f));
-
-    float x_scale = y_scale / aspectRatio;
-
-    float frustum_length = far_plane - near_plane;
-
-    // Setup view matrix
-    Matrix4f viewMatrix = new Matrix4f();
-
-    // Create a FloatBuffer with the proper size to store our matrices later
-    FloatBuffer matrix44Buffer = BufferUtils.createFloatBuffer(16);
-
-    public Camera() {
-        transform.setTranslation(new Vector3f(0, 0, 0));
+    public LayoutElement() {
     }
 
-    private float coTangent(float angle) {
-        return (float)(1f / Math.tan(angle));
+    public LayoutElement(String name) {
+        super(name);
     }
 
-    private float degreesToRadians(float degrees) {
-        return degrees * (float)(Math.PI / 180d);
+    public float getPaddingAll() {
+        return paddingAll;
     }
 
-    public void init() {
-        projectionMatrix.m00 = x_scale;
-        projectionMatrix.m11 = y_scale;
-        projectionMatrix.m22 = -((far_plane + near_plane) / frustum_length);
-        projectionMatrix.m23 = -1;
-        projectionMatrix.m32 = -((2 * near_plane * far_plane) / frustum_length);
-        projectionMatrix.m33 = 0;
+    public void setPaddingAll(float paddingAll) {
+        this.paddingAll = paddingAll;
     }
 
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
+    public float getPaddingV() {
+        return paddingV;
     }
 
-    public Transform getTransform() {
-        return transform;
+    public void setPaddingV(float paddingV) {
+        this.paddingV = paddingV;
+    }
+
+    public float getPaddingH() {
+        return paddingH;
+    }
+
+    public void setPaddingH(float paddingH) {
+        this.paddingH = paddingH;
+    }
+
+    public Vector2f getSize() {
+        return size;
+    }
+
+    public void setSize(Vector2f size) {
+        this.size = size;
+    }
+
+    public void setSize(float x, float y) {
+        if (size != null) {
+            this.size.set(x, y);
+        } else {
+            size = new Vector2f(x, y);
+        }
     }
 }

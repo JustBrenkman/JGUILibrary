@@ -29,11 +29,10 @@
  *
  */
 
-package org.jgui.mesh;
+package org.jgui.render.mesh;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
-import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -133,10 +132,9 @@ public class VertexBufferObject {
      * Sends Vertex Buffer Data to the GPU
      */
     public void uploadBuffer() {
-            vaoID = GL30.glGenVertexArrays();
-            GL30.glBindVertexArray(vaoID);
 
-
+        vaoID = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vaoID);
 
 
         /**
@@ -159,8 +157,6 @@ public class VertexBufferObject {
 
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
-        randomCoolness();
 
         // Bind to buffer 0
         GL30.glBindVertexArray(0);

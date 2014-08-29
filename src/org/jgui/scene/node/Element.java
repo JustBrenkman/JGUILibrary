@@ -29,71 +29,46 @@
  *
  */
 
-package org.jgui.util;
+package org.jgui.scene.node;
 
-import org.jgui.scene.transform.Transform;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-
-import java.nio.FloatBuffer;
+import org.jgui.manager.layout.LayoutElement;
+import org.jgui.render.mesh.Mesh;
+import org.jgui.scene.node.appearance.Material;
 
 /**
- * Created by ben on 27/08/14.
+ * Created by ben on 28/08/14.
  */
-public class Camera {
+public class Element extends LayoutElement {
 
-    private Transform transform = new Transform();
+    private Mesh mesh;
 
-    private Matrix4f projectionMatrix = new Matrix4f();
+    private Material material;
 
-    private float fov = 60f;
-
-    private float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
-
-    float near_plane = 0.1f;
-
-    float far_plane = 100f;
-
-    float y_scale = this.coTangent(this.degreesToRadians(fov / 2f));
-
-    float x_scale = y_scale / aspectRatio;
-
-    float frustum_length = far_plane - near_plane;
-
-    // Setup view matrix
-    Matrix4f viewMatrix = new Matrix4f();
-
-    // Create a FloatBuffer with the proper size to store our matrices later
-    FloatBuffer matrix44Buffer = BufferUtils.createFloatBuffer(16);
-
-    public Camera() {
-        transform.setTranslation(new Vector3f(0, 0, 0));
+    public Element() {
     }
 
-    private float coTangent(float angle) {
-        return (float)(1f / Math.tan(angle));
+    public Element(Mesh mesh) {
+        setMesh(mesh);
     }
 
-    private float degreesToRadians(float degrees) {
-        return degrees * (float)(Math.PI / 180d);
+    public Element(String name, Mesh mesh) {
+        super(name);
+        setMesh(mesh);
     }
 
-    public void init() {
-        projectionMatrix.m00 = x_scale;
-        projectionMatrix.m11 = y_scale;
-        projectionMatrix.m22 = -((far_plane + near_plane) / frustum_length);
-        projectionMatrix.m23 = -1;
-        projectionMatrix.m32 = -((2 * near_plane * far_plane) / frustum_length);
-        projectionMatrix.m33 = 0;
+    public Mesh getMesh() {
+        return mesh;
     }
 
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
     }
 
-    public Transform getTransform() {
-        return transform;
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 }

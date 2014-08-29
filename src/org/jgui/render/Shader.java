@@ -32,13 +32,19 @@
 package org.jgui.render;
 
 import org.jgui.util.PathManager;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.util.HashMap;
 
 /**
  * Created by ben on 26/08/14.
@@ -55,11 +61,14 @@ public class Shader {
 
     private String fragmentShaderLocation;
 
-    public Shader() {
+    public HashMap<String, Integer> uniforms;
 
+    public Shader() {
+        uniforms = new HashMap<>();
     }
 
     public Shader(String vertexShader, String fragmentShader) {
+        this();
         vertexShaderLocation = vertexShader;
         fragmentShaderLocation = fragmentShader;
     }
@@ -80,7 +89,6 @@ public class Shader {
 
         GL20.glBindAttribLocation(programID, 0, "in_Position");
         GL20.glBindAttribLocation(programID, 1, "in_Color");
-        GL20.glBindAttribLocation(programID, 2, "random_color");
 
         GL20.glLinkProgram(programID);
 
@@ -113,6 +121,35 @@ public class Shader {
         GL20.glCompileShader(shaderID);
 
         return shaderID;
+    }
+
+    public void addUniform(String name) {
+        int uniformLocation = GL20.glGetUniformLocation(programID, name);
+
+        if (uniformLocation == 0xffffffff) {
+
+        }
+
+        uniforms.put(name, uniformLocation);
+    }
+
+    public void updateUniformi(String name, int value) {
+        GL20.glUniform1i(uniforms.get(name), value);
+    }
+
+    public void updateUniformf(String name, float value) {
+        GL20.glUniform1f(uniforms.get(name), value);
+    }
+
+    public void updateUniformVector3f(String name, Vector3f value) {
+        GL20.glUniform3f(uniforms.get(name), value.getX(), value.getY(), value.getZ());
+    }
+
+    public void updateUniformMatrix4(String name, Matrix4f value) {
+        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+        value.store(matrixBuffer);
+        matrixBuffer.flip();
+        GL20.glUniformMatrix4(uniforms.get(name), false, matrixBuffer);
     }
 
     public void bind() {

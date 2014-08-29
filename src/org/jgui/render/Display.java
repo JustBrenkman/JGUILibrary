@@ -42,7 +42,9 @@ import org.slf4j.LoggerFactory;
 public class Display {
 
     public static final int defaultWidth = 800;
+//    public static final int defaultWidth = 1600;
     public static final int defaultHeight = 600;
+//    public static final int defaultHeight = 900;
 
     public boolean fullscreen = false;
 

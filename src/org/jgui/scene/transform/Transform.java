@@ -29,40 +29,71 @@
  *
  */
 
-package org.jgui.mesh;
+package org.jgui.scene.transform;
+
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Created by ben on 26/08/14.
+ * Created by ben on 28/08/14.
  */
-public class Vertex2f {
+public class Transform {
 
-    public Vertex2f(float x, float y) {
-        this.x = x;
-        this.y = y;
+    private Vector3f translation = null;
+
+    private Vector3f scale = new Vector3f(1, 1, 1);
+
+    private Matrix4f modelMatrix;
+
+    public Transform() {
+        modelMatrix = new Matrix4f();
     }
 
-    public Vertex2f() {
-        x = 0;
-        y = 0;
+    public Transform(Vector3f translation) {
+        this();
+        this.translation = translation;
     }
 
-    private float x;
-
-    private float y;
-
-    public float getX() {
-        return x;
+    public Transform(Vector3f translation, Vector3f scale) {
+        this();
+        this.translation = translation;
+        this.scale = scale;
     }
 
-    public void setX(float x) {
-        this.x = x;
+    public Vector3f getTranslation() {
+        return translation;
     }
 
-    public float getY() {
-        return y;
+    public void setTranslation(Vector3f translation) {
+        this.translation = translation;
     }
 
-    public void setY(float y) {
-        this.y = y;
+    public Vector3f getScale() {
+        return scale;
+    }
+
+    public void setScale(Vector3f scale) {
+        this.scale = scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale.set(scale, scale, scale);
+    }
+
+    public void updateTransformation() {
+        modelMatrix = new Matrix4f();
+        Matrix4f.scale(scale, modelMatrix, modelMatrix);
+        Matrix4f.translate(translation, modelMatrix, modelMatrix);
+        Matrix4f.rotate(0, new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
+        Matrix4f.rotate(0, new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate(0, new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+    }
+
+    public Matrix4f getModelMatrix() {
+        return modelMatrix;
+    }
+
+    public void setModelMatrix(Matrix4f modelMatrix) {
+        this.modelMatrix = modelMatrix;
     }
 }
