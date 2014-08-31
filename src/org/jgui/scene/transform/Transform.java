@@ -77,7 +77,7 @@ public class Transform {
     }
 
     public void setScale(float scale) {
-        this.scale.set(scale, scale, scale);
+        this.scale = new Vector3f(scale, scale, scale);
     }
 
     public void updateTransformation() {

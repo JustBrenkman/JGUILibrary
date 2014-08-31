@@ -100,7 +100,7 @@ public class JGUI {
         Mesh mesh = new Mesh();
 
         Transform t = new Transform();
-        t.setTranslation(new Vector3f(0.1f, 0, -2f));
+        t.setTranslation(new Vector3f(0, 0, -2f));
 
         mesh.getMesh().addVerticies(-1, -1, 0, 1, 1, -1);
         mesh.getMesh().addColor(new Color(0x2d89ef));
@@ -148,7 +148,8 @@ public class JGUI {
 
             temp += 0.1f;
 
-            t.setTranslation(new Vector3f(((float) Mouse.getX() / org.lwjgl.opengl.Display.getWidth()) * 2 - 1, ((float)Mouse.getY() / Display.defaultHeight) * 2 - 1, 0));
+            t.setTranslation(new Vector3f(0, 0, -2 - (float) Math.abs(Math.sin(temp))));
+//            t.setTranslation(new Vector3f(((float) Mouse.getX() / org.lwjgl.opengl.Display.getWidth()) * 2 - 1, ((float)Mouse.getY() / Display.defaultHeight) * 2 - 1, 0));
             t.updateTransformation();
 
             shader.bind();

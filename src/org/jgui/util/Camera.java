@@ -46,7 +46,7 @@ public class Camera {
 
     private Transform transform = new Transform();
 
-    private Matrix4f projectionMatrix = new Matrix4f();
+    private Matrix4f projectionMatrix = null;
 
     private float fov = 60f;
 
@@ -70,6 +70,7 @@ public class Camera {
 
     public Camera() {
         transform.setTranslation(new Vector3f(0, 0, 0));
+        projectionMatrix = new Matrix4f();
     }
 
     private float coTangent(float angle) {
