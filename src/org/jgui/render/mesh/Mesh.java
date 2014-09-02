@@ -45,4 +45,8 @@ public class Mesh {
     public MeshData getMesh() {
         return mesh;
     }
+
+    public void destroy() {
+        mesh.getVbo().destroy();
+    }
 }

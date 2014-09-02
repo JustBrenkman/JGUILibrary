@@ -43,6 +43,8 @@ public class Transform {
 
     private Vector3f scale = new Vector3f(1, 1, 1);
 
+    private Vector3f rotation = new Vector3f(0, 0, 0);
+
     private Matrix4f modelMatrix;
 
     public Transform() {
@@ -80,13 +82,21 @@ public class Transform {
         this.scale = new Vector3f(scale, scale, scale);
     }
 
+    public Vector3f getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Vector3f rotation) {
+        this.rotation = rotation;
+    }
+
     public void updateTransformation() {
         modelMatrix = new Matrix4f();
         Matrix4f.scale(scale, modelMatrix, modelMatrix);
         Matrix4f.translate(translation, modelMatrix, modelMatrix);
-        Matrix4f.rotate(0, new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
-        Matrix4f.rotate(0, new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
-        Matrix4f.rotate(0, new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getX(), new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getY(), new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getZ(), new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
     }
 
     public Matrix4f getModelMatrix() {

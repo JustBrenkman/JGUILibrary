@@ -29,45 +29,54 @@
  *
  */
 
-package org.jgui.render;
+package org.jgui.util;
 
-import org.jgui.render.mesh.Mesh;
-import org.jgui.scene.node.Element;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.Display;
 
 /**
- * Created by ben on 25/08/14.
+ * Created by ben on 01/09/14.
  */
-public interface IRenderer {
+public class FPS {
+    long lastFrame = 0;
 
-    public void initialize();
+    int fps = 0;
 
-    public void renderImage();
+    long lastFPS = 0;
 
-    public void renderLine();
+    int FramesPerSecond = 0;
 
-    public void renderRectangle();
+    public FPS() {
 
-    public void renderTriangle();
+    }
 
-    public void renderCircle();
+    public void initialize() {
+        getDelta();
+        lastFPS = getTime();
+    }
 
-    public void renderVBO();
+    private long getTime() {
+        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    }
 
-    public void setFrameBuffer();
+    private long getDelta() {
+        long time = getTime();
+        int delta = (int) (time - lastFrame);
+        lastFrame = time;
 
-    public void renderMesh(Mesh mesh, Shader shader);
+        return delta;
+    }
 
-    public void renderElement(Element element);
+    public void update() {
+        if (getTime() - lastFPS > 1000) {
+            FramesPerSecond = fps;
+            fps = 0;
+            lastFPS += 1000;
+        }
+        fps++;
+    }
 
-    public void clearBuffers();
-
-    public void uploadVBO();
-
-    public void shutDown();
-
-    public void enableScissor(int x, int y, int width, int height);
-
-    public void disableScissor();
-
-//    public void setInternalResolution();
+    public int getFPS() {
+        return FramesPerSecond;
+    }
 }

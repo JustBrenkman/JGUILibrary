@@ -34,6 +34,7 @@ package org.jgui.util;
 import org.jgui.scene.transform.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -54,7 +55,7 @@ public class Camera {
 
     float near_plane = 0.1f;
 
-    float far_plane = 100f;
+    float far_plane = 800f;
 
     float y_scale = this.coTangent(this.degreesToRadians(fov / 2f));
 
@@ -96,5 +97,97 @@ public class Camera {
 
     public Transform getTransform() {
         return transform;
+    }
+
+    public Matrix4f orthoMatrix(float left, float right, float bottom, float top, float near, float far) {
+        Matrix4f matrix = new Matrix4f();
+        float x_orth = 2 / (right - left);
+        float y_orth = 2 / (top - bottom);
+        float z_orth = -2 / (far - near);
+
+        float tx = -(right + left) / (right - left);
+        float ty = -(top + bottom) / (top - bottom);
+        float tz = -(far + near) / (far - near);
+
+        matrix.m00 = x_orth;
+        matrix.m10 = 0;
+        matrix.m20 = 0;
+        matrix.m30 = 0;
+        matrix.m01 = 0;
+        matrix.m11 = y_orth;
+        matrix.m21 = 0;
+        matrix.m31 = 0;
+        matrix.m02 = 0;
+        matrix.m12 = 0;
+        matrix.m22 = z_orth;
+        matrix.m32 = 0;
+        matrix.m03 = tx;
+        matrix.m13 = ty;
+        matrix.m23 = tz;
+        matrix.m33 = 1;
+
+        return matrix;
+    }
+
+    public static Matrix4f identityMat() {
+        Matrix4f mat = new Matrix4f();
+        mat.m00 = 1;
+        mat.m01 = 0;
+        mat.m02 = 0;
+        mat.m03 = 0;
+        mat.m10 = 0;
+        mat.m11 = 1;
+        mat.m12 = 0;
+        mat.m13 = 0;
+        mat.m20 = 0;
+        mat.m21 = 0;
+        mat.m22 = 1;
+        mat.m23 = 0;
+        mat.m30 = 0;
+        mat.m31 = 0;
+        mat.m32 = 0;
+        mat.m33 = 1;
+        return mat;
+    }
+
+    /**
+     *
+     * @param x - left
+     * @param y - bottom
+     * @param width - right
+     * @param height - top
+     * @param near - near
+     * @param far - far
+     * @return
+     */
+    public Matrix4f orthograpic(float x, float y, float width, float height, float near, float far) {
+
+        Matrix4f mat = identityMat();
+        float x_orth = 2 / (width - x);
+        float y_orth = 2 / (height - y);
+        float z_orth = -2 / (far - near);
+
+        float tx = -(width + x) / (width - x);
+        float ty = -(height + y) / (height - y);
+        float tz = -(far + near) / (far - near);
+
+        mat.m00 = x_orth;
+        mat.m01 = 0;
+        mat.m02 = 0;
+        mat.m03 = 0;
+        mat.m10 = 0;
+        mat.m11 = y_orth;
+        mat.m12 = 0;
+        mat.m13 = 0;
+        mat.m20 = 0;
+        mat.m21 = 0;
+        mat.m22 = z_orth;
+        mat.m23 = 0;
+        mat.m30 = tx;
+        mat.m31 = ty;
+        mat.m32 = tz;
+        mat.m33 = 1;
+
+        return mat;
     }
 }

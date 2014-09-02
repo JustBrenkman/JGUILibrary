@@ -38,6 +38,7 @@ import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
 import org.jgui.scene.transform.Transform;
 import org.jgui.util.Camera;
+import org.jgui.util.FPS;
 import org.jgui.util.PathManager;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
@@ -51,6 +52,8 @@ public class JGUI {
 
     private IRenderer renderer;
 
+    private FPS fps;
+
     public JGUI() {
         display = new Display();
 
@@ -63,6 +66,7 @@ public class JGUI {
     public void intitialize() {
         display.create();
         renderer.initialize();
+        fps = new FPS();
 //        renderer.clearBuffers();
     }
 
@@ -100,14 +104,22 @@ public class JGUI {
         Mesh mesh = new Mesh();
 
         Transform t = new Transform();
-        t.setTranslation(new Vector3f(0, 0, -2f));
+        t.setScale(new Vector3f(1, 1, 1));
+        t.setRotation(new Vector3f(0, 0, -2f));
+        t.setTranslation(new Vector3f(0, 0, 0));
 
-        mesh.getMesh().addVerticies(-1, -1, 0, 1, 1, -1);
+        Transform tr = new Transform();
+        tr.setTranslation(new Vector3f(0, 0, -520f));
+        tr.setRotation(new Vector3f(0, 0, 0));
+        tr.setScale(1);
+
+        mesh.getMesh().addVertex(new Vector3f(-1, -1, 0));
+        mesh.getMesh().addVertex(new Vector3f(0, 1, 0));
+        mesh.getMesh().addVertex(new Vector3f(1, -1, 0));
         mesh.getMesh().addColor(new Color(0x2d89ef));
         mesh.getMesh().addColor(new Color(0x2D89EF));
         mesh.getMesh().addColor(new Color(0x2D89EF));
-        mesh.getMesh().addColor(new Color(0x2D89EF));
-        byte[] indecies = {0, 1, 2, 2, 3, 0};
+        byte[] indecies = {0, 1, 2};
         mesh.getMesh().addIndecies(indecies);
 
         mesh.getMesh().compile();
@@ -121,6 +133,33 @@ public class JGUI {
         shader.addUniform("projectionMatrix");
         shader.addUniform("viewMatrix");
 
+        /**
+         * Normal Shader
+         */
+        Shader normalShader = new Shader("vert.glsl", "frag.glsl");
+        normalShader.loadShaders();
+        normalShader.compile();
+
+        normalShader.addUniform("modelMatrix");
+        normalShader.addUniform("projectionMatrix");
+        normalShader.addUniform("viewMatrix");
+
+        /**
+         * Box mesh setup
+         */
+        Mesh box = new Mesh();
+        box.getMesh().addVerticies(new Vector3f(-400f, 300f, 0), new Vector3f(-400f, -300f, 0), new Vector3f(400f, -300f, 0), new Vector3f(400f, 300f, 0));
+        box.getMesh().addColor(new Color(0x000000));
+        box.getMesh().addColor(new Color(0x000000));
+        box.getMesh().addColor(new Color(0x000000));
+        box.getMesh().addColor(new Color(0x000000));
+        byte[] ind = {0, 1, 2, 2, 3, 0};
+        box.getMesh().addIndecies(ind);
+        box.getMesh().compile();
+
+        /**
+         * DisplayMode listing
+         */
         org.lwjgl.opengl.DisplayMode[] modes = new org.lwjgl.opengl.DisplayMode[0];
         try {
             modes = org.lwjgl.opengl.Display.getAvailableDisplayModes();
@@ -142,15 +181,26 @@ public class JGUI {
             e.printStackTrace();
         }
 
+        fps.initialize();
+
+        int lastFPS = 0;
+
         while (!display.isCloseRequested()) {
 
+            // updates FPS
+            fps.update();
+
+            // clears screen
             display.clear();
 
             temp += 0.1f;
 
             t.setTranslation(new Vector3f(0, 0, -2 - (float) Math.abs(Math.sin(temp))));
 //            t.setTranslation(new Vector3f(((float) Mouse.getX() / org.lwjgl.opengl.Display.getWidth()) * 2 - 1, ((float)Mouse.getY() / Display.defaultHeight) * 2 - 1, 0));
+            t.setRotation(new Vector3f(temp / 10, 0, 0));
             t.updateTransformation();
+
+            tr.updateTransformation();
 
             shader.bind();
             shader.updateUniformf("uniformFloat", (float) Math.abs(Math.sin(temp)));
@@ -159,10 +209,27 @@ public class JGUI {
             shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             shader.unBind();
 
+            normalShader.bind();
+            normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
+            normalShader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+            normalShader.unBind();
+
+            renderer.renderMesh(box, normalShader);
             renderer.renderMesh(mesh, shader);
+
+            // Calculates wether or not to print the fps
+            if (lastFPS != fps.getFPS()) {
+                System.out.println(fps.getFPS());
+                lastFPS = fps.getFPS();
+            }
 
             display.update();
         }
+
+        shader.destroy();
+        mesh.destroy();
+        box.destroy();
 
         display.destroy();
     }

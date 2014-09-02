@@ -47,6 +47,10 @@ public class JGUILibrary {
     }
 
     public static void start() {
+
+//        System.setProperty("org.lwjgl.opengl.Window.undecorated", String.valueOf(true));
+//        System.setProperty("java.library.path", "natives/linux");
+
         gui.intitialize();
 
         logger.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));

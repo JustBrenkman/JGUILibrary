@@ -32,6 +32,7 @@
 package org.jgui.render;
 
 import org.jgui.render.mesh.Mesh;
+import org.jgui.scene.node.Element;
 import org.lwjgl.opengl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,11 @@ public class OpenGLRenderer implements IRenderer {
         GL30.glBindVertexArray(0);
 
         shader.unBind();
+    }
+
+    @Override
+    public void renderElement(Element element) {
+
     }
 
     @Override

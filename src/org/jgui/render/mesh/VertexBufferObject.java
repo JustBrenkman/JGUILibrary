@@ -144,7 +144,7 @@ public class VertexBufferObject {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
 
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, 0, 0);
+        GL20.glVertexAttribPointer(0, 4, GL11.GL_FLOAT, false, 0, 0);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
@@ -171,21 +171,21 @@ public class VertexBufferObject {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    private void randomCoolness() {
-
-        float[] color = {1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1};
-
-        FloatBuffer colorB = BufferUtils.createFloatBuffer(color.length);
-        colorB.put(color);
-        colorB.flip();
-
-        rcoID = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, rcoID);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorB, GL15.GL_STATIC_DRAW);
-
-        GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-    }
-
     public void updateBuffer() {}
+
+    public void destroy() {
+        GL30.glBindVertexArray(vaoID);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glDeleteBuffers(vboID);
+        GL15.glDeleteBuffers(cboID);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL15.glDeleteBuffers(iboID);
+
+        GL30.glBindVertexArray(0);
+        GL30.glDeleteVertexArrays(vaoID);
+    }
 }

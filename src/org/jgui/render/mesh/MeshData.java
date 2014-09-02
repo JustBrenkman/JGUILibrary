@@ -31,6 +31,8 @@
 
 package org.jgui.render.mesh;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ import java.util.List;
  */
 public class MeshData {
 
-    private List<Vertex2f> vertices = new ArrayList<>();
+    private List<Vector3f> vertices = new ArrayList<>();
     private List<Color> colors = new ArrayList<>();
     private List<Byte> indecies = new ArrayList<>();
 
@@ -50,22 +52,14 @@ public class MeshData {
 
     private boolean flagDirty = true;
 
-    public void addVertex(Vertex2f vertex2f) {
-        vertices.add(vertex2f);
+    public void addVertex(Vector3f vector3f) {
+        vertices.add(vector3f);
     }
 
-    public void addVerticies(Vertex2f... v) {
+    public void addVerticies(Vector3f... v) {
         for (int i = 0; i < v.length; i++) {
             vertices.add(v[i]);
         }
-    }
-
-    public void addVerticies(float... v) {
-//        for (int i = 0; i < v.length; i += 2) {
-//            vertices.add(new Vertex2f(v[i / 2], v[(i / 2) + 1]));
-//        }
-
-        verticies = v;
     }
 
     /**
@@ -116,22 +110,21 @@ public class MeshData {
     }
 
     public float[] getVerticies() {
-        float[] ver = new float[vertices.size() * 2];
+        float ver[] = new float[vertices.size() * 4];
 
-        for (int i = 0; i < ver.length; i += 2) {
-            ver[i] = vertices.get(i / 2).getX();
-            ver[i + 1] = vertices.get(i / 2).getY();
+        for (int i = 0; i < vertices.size() * 4; i += 4) {
+            ver[i] = vertices.get(i / 4).getX();
+            ver[i + 1] = vertices.get(i / 4).getY();
+            ver[i + 2] = vertices.get(i / 4).getZ();
+            ver[i + 3] = 1;
+
+            System.out.println(ver[i] + ", " + ver[i + 1] + ", " + ver[i + 2] + ", " + ver[i + 3]);
         }
 
-        if (vertices != null) {
-//        return ver;
-            return verticies;
-        } else {
-            return ver;
-        }
+        return ver;
     }
 
-    public List<Vertex2f> getVertices() {
+    public List<Vector3f> getVertices() {
         return vertices;
     }
 
