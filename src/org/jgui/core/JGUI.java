@@ -185,6 +185,9 @@ public class JGUI {
 
         int lastFPS = 0;
 
+        /**
+         * main loop
+         */
         while (!display.isCloseRequested()) {
 
             // updates FPS
