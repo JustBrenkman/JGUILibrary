@@ -92,7 +92,8 @@ public class Camera {
         projectionMatrix.m32 = -((2 * near_plane * far_plane) / frustum_length);
         projectionMatrix.m33 = 0;
 
-        orthoGraphicMatrix = Ortho(-Display.getWidth() / 2, Display.getWidth() / 2, Display.getHeight() / 2, -Display.getHeight() / 2, 0, 100);
+//        orthoGraphicMatrix = Ortho(-Display.getWidth() / 2, Display.getWidth() / 2, Display.getHeight() / 2, -Display.getHeight() / 2, 0, 100);
+        orthoGraphicMatrix = Ortho(0, Display.getWidth(), Display.getHeight(), 0, 0, 100);
     }
 
     public Matrix4f getProjectionMatrix() {

@@ -113,9 +113,9 @@ public class JGUI {
         tr.setRotation(new Vector3f(0, 0, 0));
         tr.setScale(1);
 
-        mesh.getMesh().addVertex(new Vector3f(-1, -1, 0));
-        mesh.getMesh().addVertex(new Vector3f(0, 1, 0));
-        mesh.getMesh().addVertex(new Vector3f(1, -1, 0));
+        mesh.getMesh().addVertex(new Vector3f(-100, -100, 0));
+        mesh.getMesh().addVertex(new Vector3f(0, 100, 0));
+        mesh.getMesh().addVertex(new Vector3f(100, -100, 0));
         mesh.getMesh().addColor(new Color(0x2d89ef));
         mesh.getMesh().addColor(new Color(0x2D89EF));
         mesh.getMesh().addColor(new Color(0x2D89EF));
@@ -198,8 +198,7 @@ public class JGUI {
 
             temp += 0.1f;
 
-            t.setTranslation(new Vector3f(0, 0, -2 - (float) Math.abs(Math.sin(temp))));
-//            t.setTranslation(new Vector3f(((float) Mouse.getX() / org.lwjgl.opengl.Display.getWidth()) * 2 - 1, ((float)Mouse.getY() / Display.defaultHeight) * 2 - 1, 0));
+            t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
             t.setRotation(new Vector3f(temp / 10, 0, 0));
             t.updateTransformation();
 
@@ -208,7 +207,7 @@ public class JGUI {
             shader.bind();
             shader.updateUniformf("uniformFloat", (float) Math.abs(Math.sin(temp)));
             shader.updateUniformMatrix4("modelMatrix", t.getModelMatrix());
-            shader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            shader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
             shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             shader.unBind();
 
@@ -218,7 +217,7 @@ public class JGUI {
             normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             normalShader.unBind();
 
-//            renderer.renderMesh(mesh, shader);
+            renderer.renderMesh(mesh, shader);
             renderer.renderMesh(box, normalShader);
 
             // Calculates wether or not to print the fps
