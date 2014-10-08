@@ -218,7 +218,7 @@ public class JGUI {
             normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             normalShader.unBind();
 
-            renderer.renderMesh(mesh, shader);
+//            renderer.renderMesh(mesh, shader);
             renderer.renderMesh(box, normalShader);
 
             // Calculates wether or not to print the fps
