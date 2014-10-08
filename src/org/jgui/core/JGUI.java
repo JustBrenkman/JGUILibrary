@@ -109,7 +109,7 @@ public class JGUI {
         t.setTranslation(new Vector3f(0, 0, 0));
 
         Transform tr = new Transform();
-        tr.setTranslation(new Vector3f(0, 0, -520f));
+        tr.setTranslation(new Vector3f(0, 0, 0f));
         tr.setRotation(new Vector3f(0, 0, 0));
         tr.setScale(1);
 
@@ -136,7 +136,7 @@ public class JGUI {
         /**
          * Normal Shader
          */
-        Shader normalShader = new Shader("vert.glsl", "frag.glsl");
+        Shader normalShader = new Shader("vs.glsl", "fs.glsl");
         normalShader.loadShaders();
         normalShader.compile();
 
@@ -148,11 +148,11 @@ public class JGUI {
          * Box mesh setup
          */
         Mesh box = new Mesh();
-        box.getMesh().addVerticies(new Vector3f(-400f, 300f, 0), new Vector3f(-400f, -300f, 0), new Vector3f(400f, -300f, 0), new Vector3f(400f, 300f, 0));
-        box.getMesh().addColor(new Color(0x000000));
-        box.getMesh().addColor(new Color(0x000000));
-        box.getMesh().addColor(new Color(0x000000));
-        box.getMesh().addColor(new Color(0x000000));
+        box.getMesh().addVerticies(new Vector3f(-40f, 30f, 0), new Vector3f(-40f, -30f, 0), new Vector3f(40f, -30f, 0), new Vector3f(40f, 30f, 0));
+        box.getMesh().addColor(new Color(0xe51c23));
+        box.getMesh().addColor(new Color(0xe51c23));
+        box.getMesh().addColor(new Color(0xe51c23));
+        box.getMesh().addColor(new Color(0xe51c23));
         byte[] ind = {0, 1, 2, 2, 3, 0};
         box.getMesh().addIndecies(ind);
         box.getMesh().compile();
@@ -214,12 +214,12 @@ public class JGUI {
 
             normalShader.bind();
             normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
-            normalShader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
             normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             normalShader.unBind();
 
-            renderer.renderMesh(box, normalShader);
             renderer.renderMesh(mesh, shader);
+            renderer.renderMesh(box, normalShader);
 
             // Calculates wether or not to print the fps
             if (lastFPS != fps.getFPS()) {
@@ -231,6 +231,7 @@ public class JGUI {
         }
 
         shader.destroy();
+        normalShader.destroy();
         mesh.destroy();
         box.destroy();
 

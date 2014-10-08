@@ -48,6 +48,7 @@ public class Camera {
     private Transform transform = new Transform();
 
     private Matrix4f projectionMatrix = null;
+    private Matrix4f orthoGraphicMatrix = null;
 
     private float fov = 60f;
 
@@ -72,6 +73,7 @@ public class Camera {
     public Camera() {
         transform.setTranslation(new Vector3f(0, 0, 0));
         projectionMatrix = new Matrix4f();
+        orthoGraphicMatrix = new Matrix4f();
     }
 
     private float coTangent(float angle) {
@@ -89,10 +91,16 @@ public class Camera {
         projectionMatrix.m23 = -1;
         projectionMatrix.m32 = -((2 * near_plane * far_plane) / frustum_length);
         projectionMatrix.m33 = 0;
+
+        orthoGraphicMatrix = Ortho(-Display.getWidth() / 2, Display.getWidth() / 2, Display.getHeight() / 2, -Display.getHeight() / 2, 0, 100);
     }
 
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
+    }
+
+    public Matrix4f getOrthoGraphicMatrix() {
+        return orthoGraphicMatrix;
     }
 
     public Transform getTransform() {
@@ -187,6 +195,33 @@ public class Camera {
         mat.m31 = ty;
         mat.m32 = tz;
         mat.m33 = 1;
+
+        return mat;
+    }
+
+    public Matrix4f Ortho(float left, float right, float top, float bottom, float znear, float zfar) {
+
+        Matrix4f mat = identityMat();
+        
+        mat.m00 = 2.0f/(right-left);
+        mat.m01 = 0.0f;
+        mat.m02 = 0.0f;
+        mat.m03 = 0.0f;
+
+        mat.m10 = 0.0f;
+        mat.m11 = 2.0f/(top-bottom);
+        mat.m12 = 0.0f;
+        mat.m13 = 0.0f;
+
+        mat.m20 = 0.0f;
+        mat.m21 = 0.0f;
+        mat.m22 = -2.0f/(zfar-znear);
+        mat.m23 = 0.0f;
+
+        mat.m30 = -(right+left)/(right-left);
+        mat.m31 = -(top+bottom)/(top-bottom);
+        mat.m32 = -(zfar+znear)/(zfar-znear);
+        mat.m33 = 1.0f;
 
         return mat;
     }
