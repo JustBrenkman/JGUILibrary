@@ -199,6 +199,7 @@ public class JGUI {
             temp += 0.1f;
 
             t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
+            t.setScale(new Vector3f(1, 1, 1));
             t.setRotation(new Vector3f(temp / 10, 0, 0));
             t.updateTransformation();
 
