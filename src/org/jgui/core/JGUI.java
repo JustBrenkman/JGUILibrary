@@ -31,6 +31,8 @@
 
 package org.jgui.core;
 
+import org.jgui.eventbus.EventBusService;
+import org.jgui.eventbus.EventHandler;
 import org.jgui.render.mesh.Mesh;
 import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
@@ -68,6 +70,7 @@ public class JGUI {
         renderer.initialize();
         fps = new FPS();
 //        renderer.clearBuffers();
+        EventBusService.subscribe(this);
     }
 
     public void registerWindow() {
@@ -93,6 +96,11 @@ public class JGUI {
      */
     public void start() {
         mainLoop();
+    }
+
+    @EventHandler
+    public void handleString(String event) {
+        System.out.println(event);
     }
 
     private void mainLoop() {
@@ -221,9 +229,9 @@ public class JGUI {
             renderer.renderMesh(mesh, shader);
             renderer.renderMesh(box, normalShader);
 
-            // Calculates wether or not to print the fps
+            // Calculates whether or not to print the fps
             if (lastFPS != fps.getFPS()) {
-                System.out.println(fps.getFPS());
+//                System.out.println(fps.getFPS());
                 lastFPS = fps.getFPS();
             }
 

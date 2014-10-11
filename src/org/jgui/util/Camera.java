@@ -34,7 +34,6 @@ package org.jgui.util;
 import org.jgui.scene.transform.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 

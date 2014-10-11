@@ -29,46 +29,29 @@
  *
  */
 
-package org.jgui;
+package org.jgui.eventbus;
 
-import org.jgui.eventbus.EventBusService;
-import org.jgui.eventbus.EventHandler;
-import org.jgui.events.Event;
-import org.lwjgl.opengl.GL11;
-import org.jgui.core.JGUI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.EventObject;
 
-public class JGUILibrary {
+/**
+ * Created by ben on 09/10/14.
+ */
+public class BusExceptionEvent extends EventObject {
 
-    public static JGUI gui = new JGUI();
+    private static final long serialVersionUID = 1L;
 
-    static Logger logger = LoggerFactory.getLogger(JGUILibrary.class);
+    private final Throwable cause;
 
-    @EventHandler
-    public void handleEvent(Integer event) {
-        System.out.println(event);
+    public BusExceptionEvent(Object subscriber, Throwable cause) {
+        super(subscriber);
+        this.cause = cause;
     }
 
-    public static void main(String[] args) {
-        JGUILibrary jguiLibrary = new JGUILibrary();
-        EventBusService.subscribe(jguiLibrary);
-        jguiLibrary.start();
+    public Object getSubscriber() {
+        return getSource();
     }
 
-    public void start() {
-
-//        System.setProperty("org.lwjgl.opengl.Window.undecorated", String.valueOf(true));
-//        System.setProperty("java.library.path", "natives/linux");
-
-        gui.intitialize();
-
-        EventBusService.publish(64);
-        EventBusService.publish("EventBusService Test");
-
-        logger.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
-
-        gui.start();
+    public Throwable getCause() {
+        return cause;
     }
-
 }
