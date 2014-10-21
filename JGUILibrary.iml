@@ -14,6 +14,8 @@
     <orderEntry type="library" exported="" name="lwjgl" level="project" />
     <orderEntry type="library" name="slf4j-api-1.7.7" level="project" />
     <orderEntry type="module" module-name="EventBus" />
+    <orderEntry type="library" name="bluecove-2.1.0" level="project" />
+    <orderEntry type="library" name="bluecove-gpl-2.1.0" level="project" />
   </component>
 </module>
 

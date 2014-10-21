@@ -118,7 +118,7 @@ public class MeshData {
             ver[i + 2] = vertices.get(i / 4).getZ();
             ver[i + 3] = 1;
 
-            System.out.println(ver[i] + ", " + ver[i + 1] + ", " + ver[i + 2] + ", " + ver[i + 3]);
+//            System.out.println(ver[i] + ", " + ver[i + 1] + ", " + ver[i + 2] + ", " + ver[i + 3]);
         }
 
         return ver;

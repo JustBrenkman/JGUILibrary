@@ -29,53 +29,16 @@
  *
  */
 
-package org.jgui;
+package org.jgui.events.listeners;
 
-import org.jgui.eventbus.EventBusService;
-import org.jgui.eventbus.EventHandler;
-import org.jgui.events.Event;
-import org.jgui.util.BlueTooth;
-import org.lwjgl.opengl.GL11;
-import org.jgui.core.JGUI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+/**
+ * Created by ben on 14/10/14.
+ */
+public class IRSeekerEvent {
 
-public class JGUILibrary {
+    public int irSeekerDirAC;
 
-    public static JGUI gui = new JGUI();
-
-    static Logger logger = LoggerFactory.getLogger(JGUILibrary.class);
-
-    @EventHandler
-    public void handleEvent(Integer event) {
-        System.out.println(event);
+    public IRSeekerEvent(int irSeekerdirAC) {
+        this.irSeekerDirAC = irSeekerdirAC;
     }
-
-    @EventHandler
-    public void handleString(String event) {
-        System.out.println(event);
-    }
-
-    public static void main(String[] args) {
-        JGUILibrary jguiLibrary = new JGUILibrary();
-        EventBusService.subscribe(jguiLibrary);
-        jguiLibrary.start();
-    }
-
-    public void start() {
-
-//        System.setProperty("org.lwjgl.opengl.Window.undecorated", String.valueOf(true));
-//        System.setProperty("java.library.path", "natives/linux");
-
-        BlueTooth tooth = new BlueTooth();
-        EventBusService.subscribe(tooth);
-        tooth.openConnection();
-
-        gui.intitialize();
-
-        logger.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
-
-        gui.start();
-    }
-
 }

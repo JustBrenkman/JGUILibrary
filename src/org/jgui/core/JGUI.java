@@ -33,6 +33,8 @@ package org.jgui.core;
 
 import org.jgui.eventbus.EventBusService;
 import org.jgui.eventbus.EventHandler;
+import org.jgui.events.ShutDownEvent;
+import org.jgui.events.listeners.IRSeekerEvent;
 import org.jgui.render.mesh.Mesh;
 import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
@@ -55,6 +57,12 @@ public class JGUI {
     private IRenderer renderer;
 
     private FPS fps;
+
+    public boolean reading = true;
+
+    public int dir;
+
+    public int flipped = 1;
 
     public JGUI() {
         display = new Display();
@@ -99,8 +107,13 @@ public class JGUI {
     }
 
     @EventHandler
-    public void handleString(String event) {
-        System.out.println(event);
+    public void handle(Boolean b) {
+        reading = b;
+    }
+
+    @EventHandler
+    public void handleIR(IRSeekerEvent event) {
+        this.dir = event.irSeekerDirAC;
     }
 
     private void mainLoop() {
@@ -120,6 +133,10 @@ public class JGUI {
         tr.setTranslation(new Vector3f(0, 0, 0f));
         tr.setRotation(new Vector3f(0, 0, 0));
         tr.setScale(1);
+
+        Transform irt = new Transform();
+        irt.setTranslation(new Vector3f(0, 0, 0));
+        irt.updateTransformation();
 
         mesh.getMesh().addVertex(new Vector3f(-100, -100, 0));
         mesh.getMesh().addVertex(new Vector3f(0, 100, 0));
@@ -165,6 +182,14 @@ public class JGUI {
         box.getMesh().addIndecies(ind);
         box.getMesh().compile();
 
+        Mesh irSeeker = new Mesh();
+        irSeeker.getMesh().addVerticies(new Vector3f(-100, -100, 0), new Vector3f(0, 100, 0), new Vector3f(100, -100, 0));
+        irSeeker.getMesh().addColor(new Color(0xE51C23));
+        irSeeker.getMesh().addColor(new Color(0xE51C23));
+        irSeeker.getMesh().addColor(new Color(0xE51C23));
+        irSeeker.getMesh().addIndecies(indecies);
+        irSeeker.getMesh().compile();
+
         /**
          * DisplayMode listing
          */
@@ -177,8 +202,8 @@ public class JGUI {
 
         for (int i=0;i<modes.length;i++) {
             org.lwjgl.opengl.DisplayMode current = modes[i];
-            System.out.println(current.getWidth() + "x" + current.getHeight() + "x" +
-                    current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
+            //System.out.println(current.getWidth() + "x" + current.getHeight() + "x" +
+                    //current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
         }
 
         float temp = 0;
@@ -193,6 +218,8 @@ public class JGUI {
 
         int lastFPS = 0;
 
+        flipped = -1;
+
         /**
          * main loop
          */
@@ -206,10 +233,54 @@ public class JGUI {
 
             temp += 0.1f;
 
-            t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
+//            t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
             t.setScale(new Vector3f(1, 1, 1));
             t.setRotation(new Vector3f(temp / 10, 0, 0));
             t.updateTransformation();
+
+            irt.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
+            irt.setScale(new Vector3f(1, 1, 1));
+
+
+
+            switch (dir) {
+                case 1:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-120 * flipped), 0, 0));
+                    break;
+                case 2:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-90 * flipped), 0, 0));
+                    break;
+                case 3:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-60 * flipped), 0, 0));
+                    break;
+                case 4:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-30 * flipped), 0, 0));
+                    break;
+                case 5:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(0), 0, 0));
+                    break;
+                case 6:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(30 * flipped), 0, 0));
+                    break;
+                case 7:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(60 * flipped), 0, 0));
+                    break;
+                case 8:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(90  * flipped), 0, 0));
+                    break;
+                case 9:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(120  * flipped), 0, 0));
+                    break;
+            }
+
+            irt.updateTransformation();
+
+            if (reading) {
+                tr.setTranslation(new Vector3f(100, 100, 0));
+            } else {
+                tr.setTranslation(new Vector3f(0,0,0));
+            }
+            reading = false;
 
             tr.updateTransformation();
 
@@ -220,14 +291,21 @@ public class JGUI {
             shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             shader.unBind();
 
+//            normalShader.bind();
+//            normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
+//            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
+//            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+//            normalShader.unBind();
+//            renderer.renderMesh(box, normalShader);
+
             normalShader.bind();
-            normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
+            normalShader.updateUniformMatrix4("modelMatrix", irt.getModelMatrix());
             normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
             normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
             normalShader.unBind();
+            renderer.renderMesh(irSeeker, normalShader);
 
             renderer.renderMesh(mesh, shader);
-            renderer.renderMesh(box, normalShader);
 
             // Calculates whether or not to print the fps
             if (lastFPS != fps.getFPS()) {
@@ -237,6 +315,8 @@ public class JGUI {
 
             display.update();
         }
+
+        EventBusService.publish(new ShutDownEvent(true));
 
         shader.destroy();
         normalShader.destroy();

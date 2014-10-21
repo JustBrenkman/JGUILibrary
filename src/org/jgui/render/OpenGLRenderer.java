@@ -98,7 +98,7 @@ public class OpenGLRenderer implements IRenderer {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
 
 //        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
-        GL11.glDrawElements(GL11.GL_LINE_LOOP, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
