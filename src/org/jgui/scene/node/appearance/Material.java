@@ -31,8 +31,41 @@
 
 package org.jgui.scene.node.appearance;
 
+import java.awt.*;
+
 /**
  * Created by ben on 28/08/14.
  */
 public class Material {
+
+    private Color color;
+
+    public Material(Color color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public void getRGB() {
+
+    }
+
+    public void getRGBA() {
+
+    }
+
+    public void getR() {}
+
+    public void getG() {}
+
+    public void getB() {}
+
+    public void getA() {}
+
 }

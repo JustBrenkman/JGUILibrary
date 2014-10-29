@@ -34,7 +34,9 @@ package org.jgui;
 import org.jgui.eventbus.EventBusService;
 import org.jgui.eventbus.EventHandler;
 import org.jgui.events.Event;
+import org.jgui.events.ShutDownEvent;
 import org.jgui.util.BlueTooth;
+import org.jgui.util.NXTComm;
 import org.lwjgl.opengl.GL11;
 import org.jgui.core.JGUI;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ public class JGUILibrary {
 
     static Logger logger = LoggerFactory.getLogger(JGUILibrary.class);
 
+    public Thread nxtComm;
+
     @EventHandler
     public void handleEvent(Integer event) {
         System.out.println(event);
@@ -54,6 +58,13 @@ public class JGUILibrary {
     @EventHandler
     public void handleString(String event) {
         System.out.println(event);
+    }
+
+    @EventHandler
+    public void handleShutdown(ShutDownEvent event) {
+        if (event.shutingDown) {
+            nxtComm.stop();
+        }
     }
 
     public static void main(String[] args) {
@@ -69,7 +80,10 @@ public class JGUILibrary {
 
         BlueTooth tooth = new BlueTooth();
         EventBusService.subscribe(tooth);
-        tooth.openConnection();
+
+        nxtComm = new Thread(new NXTComm(tooth.openConnection()));
+        nxtComm.start();
+
 
         gui.intitialize();
 
@@ -77,5 +91,4 @@ public class JGUILibrary {
 
         gui.start();
     }
-
 }

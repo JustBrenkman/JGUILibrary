@@ -62,6 +62,10 @@ public class MeshData {
         }
     }
 
+    public void clearVerticies() {
+        vertices.clear();
+    }
+
     /**
      * Each color must be 4 floats long red, green, blue, alpha
      * @param c - r, g, b, a + next floats
@@ -70,6 +74,10 @@ public class MeshData {
         for (int i = 0; i < c.length; i += 4) {
             colors.add(new Color(c[i], c[(i) + 1], c[(i) + 2], c[(i) + 3]));
         }
+    }
+
+    public void clearColors() {
+        colors.clear();
     }
 
     public void addColor(Color col) {

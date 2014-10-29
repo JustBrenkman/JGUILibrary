@@ -29,16 +29,31 @@
  *
  */
 
-package org.jgui.events.listeners;
+package org.jgui.events;
 
 /**
- * Created by ben on 14/10/14.
+ * Created by ben on 28/10/14.
  */
 public class IRSeekerEvent {
 
-    public int irSeekerDirAC;
+    public int irSeekerID = 0;
+    public int irSeekerDirection = 0;
+    public int getIrSeekerS1 = 0;
+    public int getIrSeekerS2 = 0;
+    public int getIrSeekerS3 = 0;
+    public int getIrSeekerS4 = 0;
+    public int getIrSeekerS5 = 0;
 
-    public IRSeekerEvent(int irSeekerdirAC) {
-        this.irSeekerDirAC = irSeekerdirAC;
+    public IRSeekerEvent() {
+    }
+
+    public IRSeekerEvent(int irSeekerID, int irSeekerDirection, int getIrSeekerS1, int getIrSeekerS2, int getIrSeekerS3, int getIrSeekerS4, int getIrSeekerS5) {
+        this.irSeekerID = irSeekerID;
+        this.irSeekerDirection = irSeekerDirection;
+        this.getIrSeekerS1 = getIrSeekerS1;
+        this.getIrSeekerS2 = getIrSeekerS2;
+        this.getIrSeekerS3 = getIrSeekerS3;
+        this.getIrSeekerS4 = getIrSeekerS4;
+        this.getIrSeekerS5 = getIrSeekerS5;
     }
 }

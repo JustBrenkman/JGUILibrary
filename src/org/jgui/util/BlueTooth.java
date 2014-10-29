@@ -31,10 +31,8 @@
 
 package org.jgui.util;
 
-import org.jgui.eventbus.EventBusService;
 import org.jgui.eventbus.EventHandler;
 import org.jgui.events.ShutDownEvent;
-import org.jgui.events.listeners.IRSeekerEvent;
 
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
@@ -206,7 +204,7 @@ public class BlueTooth implements DiscoveryListener {
         }
     }
 
-    public void openConnection() {
+    public BufferedInputStream openConnection() {
         try {
             notifier = (StreamConnectionNotifier)Connector.open(btUrl);
 
@@ -217,13 +215,22 @@ public class BlueTooth implements DiscoveryListener {
             input = con.openInputStream();
             output = con.openOutputStream();
 
-            serialReader = new Thread(new SerialReader(input, output));
-            serialReader.start();
+//            serialReader = new Thread(new SerialReader(input, output));
+//            serialReader.start();
+
+            return new BufferedInputStream(input);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
+
+    public BufferedInputStream getBufferedInputStream() {
+        return null;
+    }
+
 
     public class SerialReader implements Runnable {
 
@@ -232,7 +239,7 @@ public class BlueTooth implements DiscoveryListener {
 
         InputStreamReader isr;
         BufferedReader ir;
-        BufferedInputStream bufferedInputStream;
+        public BufferedInputStream bufferedInputStream;
         int line;
 
         public SerialReader(InputStream input, OutputStream output) {
@@ -246,23 +253,25 @@ public class BlueTooth implements DiscoveryListener {
 
         @Override
         public void run() {
-            while (true) {
-
-                try {
-                    line = ir.read();
-
-                    EventBusService.publish("AC Direction: " + (char)(line));
-                    if (line != 0 && line != 65533 && line >= 100) {
-                        EventBusService.publish(new IRSeekerEvent(line - 100));
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                EventBusService.publish(true);
-            }
+//            while (true) {
+//
+//                try {
+//                    line = ir.read();
+//
+//                    EventBusService.publish("AC Direction: " + (line));
+//                    if (line != 0 && line != 65533 && line >= 100) {
+//                        EventBusService.publish(new IRSeekerEvent(line - 100));
+//
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                EventBusService.publish(true);
+//            }
         }
+
+
     }
 
     @EventHandler

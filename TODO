@@ -1,0 +1,109 @@
+Add class to make the changing of variables smooth, example scrolling.
+
+/////////////////////// Deprecated ///////////////////////////////////
+
+            // updates FPS
+            fps.update();
+
+            // clears screen
+            display.clear();
+
+            temp += 0.1f;
+
+//            t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
+            t.setScale(new Vector3f(1, 1, 1));
+            t.setRotation(new Vector3f(temp / 10, 0, 0));
+            t.updateTransformation();
+
+            irt.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
+            irt.setScale(new Vector3f(1, 1, 1));
+
+
+
+            switch (dir) {
+                case 1:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-120 * flipped), 0, 0));
+                    break;
+                case 2:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-90 * flipped), 0, 0));
+                    break;
+                case 3:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-60 * flipped), 0, 0));
+                    break;
+                case 4:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(-30 * flipped), 0, 0));
+                    break;
+                case 5:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(0), 0, 0));
+                    break;
+                case 6:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(30 * flipped), 0, 0));
+                    break;
+                case 7:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(60 * flipped), 0, 0));
+                    break;
+                case 8:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(90  * flipped), 0, 0));
+                    break;
+                case 9:
+                    irt.setRotation(new Vector3f((float) Math.toRadians(120  * flipped), 0, 0));
+                    break;
+            }
+
+            irt.updateTransformation();
+
+            if (reading) {
+                tr.setTranslation(new Vector3f(100, 100, 0));
+            } else {
+                tr.setTranslation(new Vector3f(0,0,0));
+            }
+            reading = false;
+
+            tr.updateTransformation();
+
+            shader.bind();
+            shader.updateUniformf("uniformFloat", (float) Math.abs(Math.sin(temp)));
+            shader.updateUniformMatrix4("modelMatrix", t.getModelMatrix());
+            shader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
+            shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+            shader.unBind();
+
+//            normalShader.bind();
+//            normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
+//            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
+//            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+//            normalShader.unBind();
+//            renderer.renderMesh(box, normalShader);
+
+            normalShader.bind();
+            normalShader.updateUniformMatrix4("modelMatrix", irt.getModelMatrix());
+            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
+            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+            normalShader.unBind();
+            renderer.renderMesh(irSeeker, normalShader);
+
+            renderer.renderMesh(mesh, shader);
+
+            // Calculates whether or not to print the fps
+            if (lastFPS != fps.getFPS()) {
+//                System.out.println(fps.getFPS());
+                lastFPS = fps.getFPS();
+            }
+
+            display.update();
+        }
+
+        EventBusService.publish(new ShutDownEvent(true));
+
+        shader.destroy();
+        normalShader.destroy();
+        mesh.destroy();
+        box.destroy();
+
+        display.destroy();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//    Deprecated info in JGUI.java, replace when finishing project
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////

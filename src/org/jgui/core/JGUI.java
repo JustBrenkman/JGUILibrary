@@ -34,7 +34,7 @@ package org.jgui.core;
 import org.jgui.eventbus.EventBusService;
 import org.jgui.eventbus.EventHandler;
 import org.jgui.events.ShutDownEvent;
-import org.jgui.events.listeners.IRSeekerEvent;
+import org.jgui.events.IRSeekerEvent;
 import org.jgui.render.mesh.Mesh;
 import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
@@ -43,6 +43,7 @@ import org.jgui.render.Shader;
 import org.jgui.scene.transform.Transform;
 import org.jgui.util.Camera;
 import org.jgui.util.FPS;
+import org.jgui.util.IRSeekerRenderer;
 import org.jgui.util.PathManager;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
@@ -113,7 +114,7 @@ public class JGUI {
 
     @EventHandler
     public void handleIR(IRSeekerEvent event) {
-        this.dir = event.irSeekerDirAC;
+        this.dir = event.irSeekerDirection;
     }
 
     private void mainLoop() {
@@ -182,13 +183,6 @@ public class JGUI {
         box.getMesh().addIndecies(ind);
         box.getMesh().compile();
 
-        Mesh irSeeker = new Mesh();
-        irSeeker.getMesh().addVerticies(new Vector3f(-100, -100, 0), new Vector3f(0, 100, 0), new Vector3f(100, -100, 0));
-        irSeeker.getMesh().addColor(new Color(0xE51C23));
-        irSeeker.getMesh().addColor(new Color(0xE51C23));
-        irSeeker.getMesh().addColor(new Color(0xE51C23));
-        irSeeker.getMesh().addIndecies(indecies);
-        irSeeker.getMesh().compile();
 
         /**
          * DisplayMode listing
@@ -206,106 +200,29 @@ public class JGUI {
                     //current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
         }
 
-        float temp = 0;
-
         try {
             Mouse.create();
         } catch (LWJGLException e) {
             e.printStackTrace();
         }
 
-        fps.initialize();
 
+        // FPS control don't delete
+        fps.initialize();
         int lastFPS = 0;
 
-        flipped = -1;
+
+        IRSeekerRenderer irSeekerRenderer = new IRSeekerRenderer(camera, renderer);
+        irSeekerRenderer.initialize();
 
         /**
          * main loop
          */
         while (!display.isCloseRequested()) {
 
-            // updates FPS
-            fps.update();
+            renderer.clearBuffers();
 
-            // clears screen
-            display.clear();
-
-            temp += 0.1f;
-
-//            t.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
-            t.setScale(new Vector3f(1, 1, 1));
-            t.setRotation(new Vector3f(temp / 10, 0, 0));
-            t.updateTransformation();
-
-            irt.setTranslation(new Vector3f(Mouse.getX(), Mouse.getY(), 0));
-            irt.setScale(new Vector3f(1, 1, 1));
-
-
-
-            switch (dir) {
-                case 1:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(-120 * flipped), 0, 0));
-                    break;
-                case 2:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(-90 * flipped), 0, 0));
-                    break;
-                case 3:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(-60 * flipped), 0, 0));
-                    break;
-                case 4:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(-30 * flipped), 0, 0));
-                    break;
-                case 5:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(0), 0, 0));
-                    break;
-                case 6:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(30 * flipped), 0, 0));
-                    break;
-                case 7:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(60 * flipped), 0, 0));
-                    break;
-                case 8:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(90  * flipped), 0, 0));
-                    break;
-                case 9:
-                    irt.setRotation(new Vector3f((float) Math.toRadians(120  * flipped), 0, 0));
-                    break;
-            }
-
-            irt.updateTransformation();
-
-            if (reading) {
-                tr.setTranslation(new Vector3f(100, 100, 0));
-            } else {
-                tr.setTranslation(new Vector3f(0,0,0));
-            }
-            reading = false;
-
-            tr.updateTransformation();
-
-            shader.bind();
-            shader.updateUniformf("uniformFloat", (float) Math.abs(Math.sin(temp)));
-            shader.updateUniformMatrix4("modelMatrix", t.getModelMatrix());
-            shader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
-            shader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
-            shader.unBind();
-
-//            normalShader.bind();
-//            normalShader.updateUniformMatrix4("modelMatrix", tr.getModelMatrix());
-//            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
-//            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
-//            normalShader.unBind();
-//            renderer.renderMesh(box, normalShader);
-
-            normalShader.bind();
-            normalShader.updateUniformMatrix4("modelMatrix", irt.getModelMatrix());
-            normalShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
-            normalShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
-            normalShader.unBind();
-            renderer.renderMesh(irSeeker, normalShader);
-
-            renderer.renderMesh(mesh, shader);
+            irSeekerRenderer.render();
 
             // Calculates whether or not to print the fps
             if (lastFPS != fps.getFPS()) {
@@ -317,11 +234,6 @@ public class JGUI {
         }
 
         EventBusService.publish(new ShutDownEvent(true));
-
-        shader.destroy();
-        normalShader.destroy();
-        mesh.destroy();
-        box.destroy();
 
         display.destroy();
     }
