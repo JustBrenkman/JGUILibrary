@@ -29,118 +29,26 @@
  *
  */
 
-package org.jgui.render.mesh;
+package org.experimental;
 
-import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
+import org.jgui.scene.geometry.Box;
 import org.jgui.scene.transform.Transform;
 import org.jgui.util.Camera;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.awt.*;
-
 /**
- * Created by ben on 28/10/14.
+ * Created by ben on 07/11/14.
  */
-public class Box {
+public class LightTwoD extends Box {
 
-    private int x = 0, y = 0, width = 0, height = 0;
-
-    private Mesh boxMesh;
-
-    private Transform transform;
-
-    private byte[] indecies = {0, 1, 2, 2, 3, 0};
-
-    private Color color;
-
-    private Shader boxShader;
-
-    private boolean isDirty = false;
-
-    public Box() {
-
+    public LightTwoD(int x, int y, int width, int height) {
+        super(x, y, width, height);
     }
 
-    public Box(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-
-        boxMesh = new Mesh();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-        isDirty = true;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-        isDirty = true;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-        isDirty = true;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-        isDirty = true;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-        isDirty = true;
-    }
-
-    /**
-     * Refreshes the verticies and colors of the box
-     */
-    public void refresh() {
-        if (isDirty) {
-            boxMesh.getMesh().clearVerticies();
-            boxMesh.getMesh().addVerticies(new Vector3f(x, y, 0), new Vector3f(getWidth() + x, y, 0), new Vector3f(getWidth() + x, getHeight() + y, 0), new Vector3f(x, getHeight() + y, 0));
-
-            boxMesh.getMesh().clearColors();
-            boxMesh.getMesh().addColor(getColor());
-            boxMesh.getMesh().addColor(getColor());
-            boxMesh.getMesh().addColor(getColor());
-            boxMesh.getMesh().addColor(getColor());
-
-            boxMesh.getMesh().compile();
-
-            isDirty = false;
-        }
-    }
-
-    private void refreshTransform() {
-        transform.setTranslation(new Vector3f(getX(), getY(), 0));
-    }
-
+    @Override
     public void build() {
         transform = new Transform();
         transform.setTranslation(new Vector3f(getX(), getY(), 0));
@@ -156,23 +64,26 @@ public class Box {
 
         boxMesh.getMesh().compile();
 
-        boxShader = new Shader("2DBox/vs.glsl", "2DBox/fs.glsl");
+        boxShader = new Shader("Experimental/2DLightBox/vs.glsl", "Experimental/2DLightBox/fs.glsl");
         boxShader.loadShaders();
         boxShader.compile();
 
         boxShader.addUniform("modelMatrix");
         boxShader.addUniform("projectionMatrix");
         boxShader.addUniform("viewMatrix");
+        boxShader.addUniform("mouse_Pos");
     }
 
-    public void safeRender(Camera camera, IRenderer renderer) {
+    public void safeRender(Camera camera, OpenGLRenderer renderer) {
         boxShader.bind();
         refreshTransform();
         boxShader.updateUniformMatrix4("modelMatrix", transform.getModelMatrix());
         boxShader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
         boxShader.updateUniformMatrix4("viewMatrix", camera.getTransform().getModelMatrix());
+        boxShader.updateUniformVector3f("mouse_Pos", new Vector3f(Mouse.getX(), Mouse.getY(), 0));
         boxShader.unBind();
 
+//        renderer.renderMesh(boxMesh, boxShader);
         renderer.renderMesh(boxMesh, boxShader);
     }
 }

@@ -32,20 +32,16 @@
 package org.jgui.core;
 
 import org.jgui.eventbus.EventBusService;
-import org.jgui.eventbus.EventHandler;
 import org.jgui.events.ShutDownEvent;
-import org.jgui.events.IRSeekerEvent;
 import org.jgui.render.mesh.Mesh;
 import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
+import org.jgui.scene.node.appearance.Material;
 import org.jgui.scene.transform.Transform;
-import org.jgui.util.Camera;
-import org.jgui.util.FPS;
-import org.jgui.util.IRSeekerRenderer;
-import org.jgui.util.PathManager;
-import org.lwjgl.LWJGLException;
+import org.jgui.util.*;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -55,15 +51,7 @@ public class JGUI {
 
     Display display;
 
-    private IRenderer renderer;
-
-    private FPS fps;
-
-    public boolean reading = true;
-
-    public int dir;
-
-    public int flipped = 1;
+    private OpenGLRenderer renderer;
 
     public JGUI() {
         display = new Display();
@@ -77,7 +65,6 @@ public class JGUI {
     public void intitialize() {
         display.create();
         renderer.initialize();
-        fps = new FPS();
 //        renderer.clearBuffers();
         EventBusService.subscribe(this);
     }
@@ -107,134 +94,125 @@ public class JGUI {
         mainLoop();
     }
 
-    @EventHandler
-    public void handle(Boolean b) {
-        reading = b;
-    }
-
-    @EventHandler
-    public void handleIR(IRSeekerEvent event) {
-        this.dir = event.irSeekerDirection;
-    }
-
     private void mainLoop() {
 
         Camera camera = new Camera();
         camera.init();
         camera.getTransform().updateTransformation();
 
-        Mesh mesh = new Mesh();
-
-        Transform t = new Transform();
-        t.setScale(new Vector3f(1, 1, 1));
-        t.setRotation(new Vector3f(0, 0, -2f));
-        t.setTranslation(new Vector3f(0, 0, 0));
-
-        Transform tr = new Transform();
-        tr.setTranslation(new Vector3f(0, 0, 0f));
-        tr.setRotation(new Vector3f(0, 0, 0));
-        tr.setScale(1);
-
-        Transform irt = new Transform();
-        irt.setTranslation(new Vector3f(0, 0, 0));
-        irt.updateTransformation();
-
-        mesh.getMesh().addVertex(new Vector3f(-100, -100, 0));
-        mesh.getMesh().addVertex(new Vector3f(0, 100, 0));
-        mesh.getMesh().addVertex(new Vector3f(100, -100, 0));
-        mesh.getMesh().addColor(new Color(0x2d89ef));
-        mesh.getMesh().addColor(new Color(0x2D89EF));
-        mesh.getMesh().addColor(new Color(0x2D89EF));
-        byte[] indecies = {0, 1, 2};
-        mesh.getMesh().addIndecies(indecies);
-
-        mesh.getMesh().compile();
-
-        Shader shader = new Shader("vs.glsl", "fs.glsl");
-        shader.loadShaders();
-        shader.compile();
-
-        shader.addUniform("uniformFloat");
-        shader.addUniform("modelMatrix");
-        shader.addUniform("projectionMatrix");
-        shader.addUniform("viewMatrix");
-
-        /**
-         * Normal Shader
-         */
-        Shader normalShader = new Shader("vs.glsl", "fs.glsl");
-        normalShader.loadShaders();
-        normalShader.compile();
-
-        normalShader.addUniform("modelMatrix");
-        normalShader.addUniform("projectionMatrix");
-        normalShader.addUniform("viewMatrix");
-
-        /**
-         * Box mesh setup
-         */
-        Mesh box = new Mesh();
-        box.getMesh().addVerticies(new Vector3f(-40f, 30f, 0), new Vector3f(-40f, -30f, 0), new Vector3f(40f, -30f, 0), new Vector3f(40f, 30f, 0));
-        box.getMesh().addColor(new Color(0xe51c23));
-        box.getMesh().addColor(new Color(0xe51c23));
-        box.getMesh().addColor(new Color(0xe51c23));
-        box.getMesh().addColor(new Color(0xe51c23));
-        byte[] ind = {0, 1, 2, 2, 3, 0};
-        box.getMesh().addIndecies(ind);
-        box.getMesh().compile();
-
-
-        /**
-         * DisplayMode listing
-         */
-        org.lwjgl.opengl.DisplayMode[] modes = new org.lwjgl.opengl.DisplayMode[0];
-        try {
-            modes = org.lwjgl.opengl.Display.getAvailableDisplayModes();
-        } catch (LWJGLException e) {
-            e.printStackTrace();
-        }
-
-        for (int i=0;i<modes.length;i++) {
-            org.lwjgl.opengl.DisplayMode current = modes[i];
-            //System.out.println(current.getWidth() + "x" + current.getHeight() + "x" +
-                    //current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
-        }
-
-        try {
-            Mouse.create();
-        } catch (LWJGLException e) {
-            e.printStackTrace();
-        }
-
-
-        // FPS control don't delete
-        fps.initialize();
-        int lastFPS = 0;
-
 
         IRSeekerRenderer irSeekerRenderer = new IRSeekerRenderer(camera, renderer);
         irSeekerRenderer.initialize();
+
+        Transform transform = new Transform(new Vector3f(0, 0, -10));
+        transform.updateTransformation();
+
+        Shader shader = new Shader("Experimental/Light/vs.glsl", "Experimental/Light/fs.glsl");
+//        Shader shader = new Shader("vs.glsl", "fs.glsl");
+        shader.loadShaders();
+        shader.compile();
+
+        shader.addUniform("modelMatrix");
+        shader.addUniform("projectionMatrix");
+        shader.addUniform("viewMatrix");
+        shader.addUniform("light_Pos");
+        shader.addUniform("light_Col");
+
+        Mesh box = new Mesh();
+        box.getMesh().addVerticies(new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, 0.5f), // Front
+                new Vector3f(-0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, -0.5f), new Vector3f(0.5f, 0.5f, -0.5f), new Vector3f(-0.5f, 0.5f, -0.5f), // Back
+                new Vector3f(-0.5f, -0.5f, -0.5f), new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, -0.5f), // Right
+                new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(-0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, -0.5f), // Bottom
+                new Vector3f(-0.5f, 0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, -0.5f), new Vector3f(0.5f, 0.5f, -0.5f), // Top
+                new Vector3f(0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f, 0.5f, -0.5f)); // Left
+        Material mat = new Material(Color.BLUE);
+        box.setMaterial(mat);
+        byte[] index = {0, 1, 2, 0, 2, 3,       // Front
+                       4, 6, 5, 4, 7, 6,        // Back
+                       8, 9, 10, 8, 10, 11,     // Right
+                       12, 15, 13, 12, 14, 15,  // Bottom
+                       16, 17, 19, 16, 19, 18,  // Top
+                       20, 22, 21, 20, 23, 22}; // Left
+        box.getMesh().addIndecies(index);
+        box.getMesh().addNormals(new Vector3f(0, 0, 1), new Vector3f(0, 0, 1), new Vector3f(0, 0, 1), new Vector3f(0, 0, 1),
+                new Vector3f(0, 0, -1), new Vector3f(0, 0, -1), new Vector3f(0, 0, -1), new Vector3f(0, 0, -1),
+                new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0),
+                new Vector3f(0, -1, 0), new Vector3f(0, -1, 0), new Vector3f(0, -1, 0), new Vector3f(0, -1, 0),
+                new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0),
+                new Vector3f(1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(1, 0, 0));
+        box.getMesh().setCalulateNormals(true);
+        box.getMesh().compile();
+
+        float rot = 0;
+        Vector3f camRot = new Vector3f(0, 0, 0);
+
+        Vector3f lightPos = new Vector3f(0, 0, 1);
+        Vector3f lightCol = new Vector3f(1, 1, 1);
+
+        float lastMouseX = Mouse.getX();
+        float lastMouseY = Mouse.getY();
 
         /**
          * main loop
          */
         while (!display.isCloseRequested()) {
 
+            if(Keyboard.isKeyDown(Keyboard.KEY_W))
+                camera.move(new Vector3f(0, 0, 1), 0.1f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_S))
+                camera.move(new Vector3f(0, 0, -1), 0.1f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_A))
+                camera.move(new Vector3f(1, 0, 0), 0.1f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_D))
+                camera.move(new Vector3f(-1, 0, 0), 0.1f);
+
+            if(Keyboard.isKeyDown(Keyboard.KEY_UP))
+                camRot.setZ(camRot.getZ() - 0.01f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+                camRot.setZ(camRot.getZ() + 0.01f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+                camRot.setY(camRot.getY() - 0.01f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
+                camRot.setY(camRot.getY() + 0.01f);
+
+            camera.getTransform().setRotation(camRot);
+
             renderer.clearBuffers();
 
-            irSeekerRenderer.render();
+//            camRot.setY(camRot.getY() + 0.01f);
 
-            // Calculates whether or not to print the fps
-            if (lastFPS != fps.getFPS()) {
-//                System.out.println(fps.getFPS());
-                lastFPS = fps.getFPS();
-            }
+//            camera.getTransform().setRotation(camRot);
+//            camera.getTransform().updateTransformation();
+
+            // Render 3D stuff here
+            rot += 1f;
+            transform.setRotation(new Vector3f(camera.degreesToRadians(rot), camera.degreesToRadians(rot), camera.degreesToRadians(rot)));
+            camera.updateTransform();
+
+            shader.bind();
+            transform.updateTransformation();
+            shader.updateUniformMatrix4("modelMatrix", transform.getModelMatrix());
+            shader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            shader.updateUniformMatrix4("viewMatrix", camera.getViewMatrix());
+            shader.updateUniformVector3f("light_Pos", lightPos);
+            shader.updateUniformVector3f("light_Col", lightCol);
+            shader.unBind();
+
+            renderer.renderMesh(box, shader);
+
+
+            // Reset the Camera up for Orthographics
+            camera.getTransform().setRotation(new Vector3f(0, 0, 0));
+            camera.getTransform().updateTransformation();
+
+            // Render 2D stuff here
+            irSeekerRenderer.render();
 
             display.update();
         }
 
         EventBusService.publish(new ShutDownEvent(true));
-
+        box.destroy();
         display.destroy();
     }
 }

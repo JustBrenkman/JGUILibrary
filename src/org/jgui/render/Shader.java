@@ -33,8 +33,7 @@ package org.jgui.render;
 
 import org.jgui.util.PathManager;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.*;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -42,7 +41,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
@@ -55,11 +53,15 @@ public class Shader {
 
     private int fragmentShaderID;
 
+    private int geometryShaderID;
+
     private int programID;
 
     private String vertexShaderLocation;
 
     private String fragmentShaderLocation;
+
+    private String geometryShaderLocation;
 
     public HashMap<String, Integer> uniforms;
 
@@ -73,8 +75,19 @@ public class Shader {
         fragmentShaderLocation = fragmentShader;
     }
 
+    public Shader(String vertexShaderLocation, String fragmentShaderLocation, String geometryShaderLocation) {
+        this();
+        this.vertexShaderLocation = vertexShaderLocation;
+        this.fragmentShaderLocation = fragmentShaderLocation;
+        this.geometryShaderLocation = geometryShaderLocation;
+    }
+
     public void loadShaders() {
-        loadShaders(vertexShaderLocation, fragmentShaderLocation);
+        if (geometryShaderLocation == null) {
+            loadShaders(vertexShaderLocation, fragmentShaderLocation);
+        } else {
+            loadShaders(vertexShaderLocation, fragmentShaderLocation, geometryShaderLocation);
+        }
     }
 
     public void loadShaders(String vertexShader, String fragmentShader) {
@@ -82,10 +95,20 @@ public class Shader {
         fragmentShaderID = loadShader(fragmentShader, GL20.GL_FRAGMENT_SHADER);
     }
 
+    public void loadShaders(String vertexShader, String fragmentShader, String geometryShader) {
+        vertexShaderID = loadShader(vertexShader, GL20.GL_VERTEX_SHADER);
+        fragmentShaderID = loadShader(fragmentShader, GL20.GL_FRAGMENT_SHADER);
+        geometryShaderID = loadShader(geometryShader, GL32.GL_GEOMETRY_SHADER);
+    }
+
     public void compile() {
         programID = GL20.glCreateProgram();
         GL20.glAttachShader(programID, vertexShaderID);
         GL20.glAttachShader(programID, fragmentShaderID);
+
+        if (geometryShaderID != 0) {
+            GL20.glAttachShader(programID, geometryShaderID);
+        }
 
         GL20.glBindAttribLocation(programID, 0, "in_Position");
         GL20.glBindAttribLocation(programID, 1, "in_Color");

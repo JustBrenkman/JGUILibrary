@@ -48,11 +48,15 @@ public class VertexBufferObject {
 
     private byte[] indecies;
 
+    private float[] normals;
+
     private int vboID;
 
     private int cboID;
 
     private int iboID;
+
+    private int nboID;
 
     private int vaoID;
 
@@ -64,6 +68,10 @@ public class VertexBufferObject {
 
     private ByteBuffer indexBuffer;
 
+    private FloatBuffer normalBuffer;
+
+    private boolean hasNormals = false;
+
     // Random Coolness buffer ID
     private int rcoID;
 
@@ -71,6 +79,12 @@ public class VertexBufferObject {
         setVertices(vertices);
         setIndecies(indecies);
         setColors(colors);
+    }
+
+    public VertexBufferObject(float[] vertices, float[] colors, float[] normals, byte[] indecies) {
+        this(vertices, colors, indecies);
+        setNormals(normals);
+        setHasNormals(true);
     }
 
     public VertexBufferObject(float[] vertices) {
@@ -101,6 +115,14 @@ public class VertexBufferObject {
         this.indecies = indecies;
     }
 
+    public float[] getNormals() {
+        return normals;
+    }
+
+    public void setNormals(float[] normals) {
+        this.normals = normals;
+    }
+
     public int getVboID() {
         return vboID;
     }
@@ -111,6 +133,14 @@ public class VertexBufferObject {
 
     public int getIndexID() {
         return iboID;
+    }
+
+    public boolean hasNormals() {
+        return hasNormals;
+    }
+
+    private void setHasNormals(boolean hasNormals) {
+        this.hasNormals = hasNormals;
     }
 
     public void createBuffers() {
@@ -125,6 +155,12 @@ public class VertexBufferObject {
         indexBuffer = BufferUtils.createByteBuffer(indecies.length);
         indexBuffer.put(indecies);
         indexBuffer.flip();
+
+        if (hasNormals) {
+            normalBuffer = BufferUtils.createFloatBuffer(normals.length);
+            normalBuffer.put(getNormals());
+            normalBuffer.flip();
+        }
     }
 
 
@@ -158,9 +194,19 @@ public class VertexBufferObject {
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
+        if (hasNormals) {
+            nboID = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, nboID);
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalBuffer, GL15.GL_STATIC_DRAW);
+
+            GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+            GL30.glBindVertexArray(0);
+        }
+
         // Bind to buffer 0
         GL30.glBindVertexArray(0);
-
 
         /**
          * Index binding

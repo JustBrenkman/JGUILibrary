@@ -32,12 +32,9 @@
 package org.jgui.util;
 
 import org.jgui.scene.transform.Transform;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
-
-import java.nio.FloatBuffer;
 
 /**
  * Created by ben on 27/08/14.
@@ -45,6 +42,7 @@ import java.nio.FloatBuffer;
 public class Camera {
 
     private Transform transform = new Transform();
+    private Transform orthoTransform = new Transform();
 
     private Matrix4f projectionMatrix = null;
     private Matrix4f orthoGraphicMatrix = null;
@@ -63,23 +61,73 @@ public class Camera {
 
     float frustum_length = far_plane - near_plane;
 
-    // Setup view matrix
-    Matrix4f viewMatrix = new Matrix4f();
+    private Vector3f forward;
+    private Vector3f up;
 
-    // Create a FloatBuffer with the proper size to store our matrices later
-    FloatBuffer matrix44Buffer = BufferUtils.createFloatBuffer(16);
+    public Camera(Vector3f forward, Vector3f up) {
+        this();
+
+        forward.normalise(forward);
+        up.normalise(up);
+    }
+
+    public Camera(Vector3f position) {
+        this();
+        transform.setTranslation(position);
+    }
 
     public Camera() {
         transform.setTranslation(new Vector3f(0, 0, 0));
+        orthoTransform.setTranslation(new Vector3f(0, 0, 0));
         projectionMatrix = new Matrix4f();
         orthoGraphicMatrix = new Matrix4f();
+
+        forward = new Vector3f(0, 0, 1);
+        up = new Vector3f(0, 1, 0);
+
+        forward.normalise(forward);
+        up.normalise(up);
+    }
+
+    public Vector3f getForward() {
+        return forward;
+    }
+
+    public void setForward(Vector3f forward) {
+        this.forward = forward;
+    }
+
+    public Vector3f getUp() {
+        return up;
+    }
+
+    public void setUp(Vector3f up) {
+        this.up = up;
+    }
+
+    public void move(Vector3f dir, float amount) {
+        Vector3f.add(new Vector3f(dir.getX() * amount, dir.getY() * amount, dir.getZ() * amount), transform.getTranslation(), transform.getTranslation());
+    }
+
+    public Vector3f getLeft() {
+        Vector3f left = new Vector3f();
+        Vector3f.cross(up, forward, left);
+        left.normalise(left);
+        return left;
+    }
+
+    public Vector3f getRight() {
+        Vector3f right = new Vector3f();
+        Vector3f.cross(forward, up, right);
+        right.normalise(right);
+        return right;
     }
 
     private float coTangent(float angle) {
         return (float)(1f / Math.tan(angle));
     }
 
-    private float degreesToRadians(float degrees) {
+    public float degreesToRadians(float degrees) {
         return degrees * (float)(Math.PI / 180d);
     }
 
@@ -91,7 +139,6 @@ public class Camera {
         projectionMatrix.m32 = -((2 * near_plane * far_plane) / frustum_length);
         projectionMatrix.m33 = 0;
 
-//        orthoGraphicMatrix = Ortho(-Display.getWidth() / 2, Display.getWidth() / 2, Display.getHeight() / 2, -Display.getHeight() / 2, 0, 100);
         orthoGraphicMatrix = Ortho(0, Display.getWidth(), Display.getHeight(), 0, 0, 100);
     }
 
@@ -107,34 +154,17 @@ public class Camera {
         return transform;
     }
 
-    public Matrix4f orthoMatrix(float left, float right, float bottom, float top, float near, float far) {
-        Matrix4f matrix = new Matrix4f();
-        float x_orth = 2 / (right - left);
-        float y_orth = 2 / (top - bottom);
-        float z_orth = -2 / (far - near);
+    public void updateTransform() {
+        transform.updateCameraTransformation();
+        orthoTransform.updateCameraTransformation();
+    }
 
-        float tx = -(right + left) / (right - left);
-        float ty = -(top + bottom) / (top - bottom);
-        float tz = -(far + near) / (far - near);
+    public Matrix4f getViewMatrix() {
+        return transform.getModelMatrix();
+    }
 
-        matrix.m00 = x_orth;
-        matrix.m10 = 0;
-        matrix.m20 = 0;
-        matrix.m30 = 0;
-        matrix.m01 = 0;
-        matrix.m11 = y_orth;
-        matrix.m21 = 0;
-        matrix.m31 = 0;
-        matrix.m02 = 0;
-        matrix.m12 = 0;
-        matrix.m22 = z_orth;
-        matrix.m32 = 0;
-        matrix.m03 = tx;
-        matrix.m13 = ty;
-        matrix.m23 = tz;
-        matrix.m33 = 1;
-
-        return matrix;
+    public Matrix4f getOrthoTransformation() {
+        return orthoTransform.getModelMatrix();
     }
 
     public static Matrix4f identityMat() {
@@ -158,51 +188,10 @@ public class Camera {
         return mat;
     }
 
-    /**
-     *
-     * @param x - left
-     * @param y - bottom
-     * @param width - right
-     * @param height - top
-     * @param near - near
-     * @param far - far
-     * @return
-     */
-    public Matrix4f orthograpic(float x, float y, float width, float height, float near, float far) {
-
-        Matrix4f mat = identityMat();
-        float x_orth = 2 / (width - x);
-        float y_orth = 2 / (height - y);
-        float z_orth = -2 / (far - near);
-
-        float tx = -(width + x) / (width - x);
-        float ty = -(height + y) / (height - y);
-        float tz = -(far + near) / (far - near);
-
-        mat.m00 = x_orth;
-        mat.m01 = 0;
-        mat.m02 = 0;
-        mat.m03 = 0;
-        mat.m10 = 0;
-        mat.m11 = y_orth;
-        mat.m12 = 0;
-        mat.m13 = 0;
-        mat.m20 = 0;
-        mat.m21 = 0;
-        mat.m22 = z_orth;
-        mat.m23 = 0;
-        mat.m30 = tx;
-        mat.m31 = ty;
-        mat.m32 = tz;
-        mat.m33 = 1;
-
-        return mat;
-    }
-
     public Matrix4f Ortho(float left, float right, float top, float bottom, float znear, float zfar) {
 
         Matrix4f mat = identityMat();
-        
+
         mat.m00 = 2.0f/(right-left);
         mat.m01 = 0.0f;
         mat.m02 = 0.0f;
@@ -224,5 +213,23 @@ public class Camera {
         mat.m33 = 1.0f;
 
         return mat;
+    }
+
+    public void rotate(float amount, Axis axis) {
+        switch (axis) {
+            case X_AXIS:
+                transform.setRotation(new Vector3f(amount + transform.getRotation().getX(), transform.getRotation().getY(), transform.getRotation().getZ()));
+                break;
+            case Y_AXIS:
+                transform.setRotation(new Vector3f(transform.getRotation().getX(), amount + transform.getRotation().getY(), transform.getRotation().getZ()));
+                break;
+            case Z_AXIS:
+                transform.setRotation(new Vector3f(transform.getRotation().getX(), transform.getRotation().getY(), amount + transform.getRotation().getZ()));
+                break;
+            case W_AXIS:
+                break;
+            default:
+                break;
+        }
     }
 }

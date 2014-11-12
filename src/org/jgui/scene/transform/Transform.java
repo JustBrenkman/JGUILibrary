@@ -49,6 +49,7 @@ public class Transform {
 
     public Transform() {
         modelMatrix = new Matrix4f();
+        translation = new Vector3f(0, 0, 0);
     }
 
     public Transform(Vector3f translation) {
@@ -97,6 +98,15 @@ public class Transform {
         Matrix4f.rotate(rotation.getX(), new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
         Matrix4f.rotate(rotation.getY(), new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
         Matrix4f.rotate(rotation.getZ(), new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+    }
+
+    public void updateCameraTransformation() {
+        modelMatrix = new Matrix4f();
+        Matrix4f.scale(scale, modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getX(), new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getY(), new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate(rotation.getZ(), new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+        Matrix4f.translate(translation, modelMatrix, modelMatrix);
     }
 
     public Matrix4f getModelMatrix() {

@@ -107,3 +107,5 @@ Add class to make the changing of variables smooth, example scrolling.
 //    Deprecated info in JGUI.java, replace when finishing project
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Use geometry shaders to draw primitives

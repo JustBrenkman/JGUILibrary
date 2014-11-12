@@ -51,19 +51,11 @@ public class JGUILibrary {
     public Thread nxtComm;
 
     @EventHandler
-    public void handleEvent(Integer event) {
-        System.out.println(event);
-    }
-
-    @EventHandler
-    public void handleString(String event) {
-        System.out.println(event);
-    }
-
-    @EventHandler
     public void handleShutdown(ShutDownEvent event) {
         if (event.shutingDown) {
-            nxtComm.stop();
+            if (nxtComm != null) {
+                nxtComm.stop();
+            }
         }
     }
 
@@ -78,11 +70,11 @@ public class JGUILibrary {
 //        System.setProperty("org.lwjgl.opengl.Window.undecorated", String.valueOf(true));
 //        System.setProperty("java.library.path", "natives/linux");
 
-        BlueTooth tooth = new BlueTooth();
-        EventBusService.subscribe(tooth);
-
-        nxtComm = new Thread(new NXTComm(tooth.openConnection()));
-        nxtComm.start();
+//        BlueTooth tooth = new BlueTooth();
+//        EventBusService.subscribe(tooth);
+//
+//        nxtComm = new Thread(new NXTComm(tooth.openConnection()));
+//        nxtComm.start();
 
 
         gui.intitialize();

@@ -31,9 +31,11 @@
 
 package org.jgui.render.mesh;
 
+import org.jgui.scene.node.appearance.Material;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
+import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,10 @@ public class MeshData {
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Color> colors = new ArrayList<>();
     private List<Byte> indecies = new ArrayList<>();
+    private List<Vector3f> normals = new ArrayList<>();
+    private Material material;
+
+    private boolean calulateNormals = false;
 
     private float[] verticies;
 
@@ -85,15 +91,25 @@ public class MeshData {
     }
 
     public float[] getColors() {
-        float[] ver = new float[colors.size() * 4];
+        float[] ver;
+        if (material != null) {
+            ver = new float[vertices.size() * 4];
+            for (int i = 0; i < ver.length; i += 4) {
+                ver[i] = material.getColor().getRed() / 255f;
+                ver[i + 1] = material.getColor().getGreen() / 255f;
+                ver[i + 2] = material.getColor().getBlue() / 255f;
+                ver[i + 3] = material.getColor().getAlpha() / 255f;
+            }
+        } else {
+            ver = new float[colors.size() * 4];
 
-        for (int i = 0; i < ver.length; i += 4) {
-            ver[i] = colors.get(i / 4).getRed() / 255f;
-            ver[i + 1] = colors.get(i / 4).getGreen() / 255f;
-            ver[i + 2] = colors.get(i / 4).getBlue() / 255f;
-            ver[i + 3] = colors.get(i / 4).getAlpha() / 255f;
+            for (int i = 0; i < ver.length; i += 4) {
+                ver[i] = colors.get(i / 4).getRed() / 255f;
+                ver[i + 1] = colors.get(i / 4).getGreen() / 255f;
+                ver[i + 2] = colors.get(i / 4).getBlue() / 255f;
+                ver[i + 3] = colors.get(i / 4).getAlpha() / 255f;
+            }
         }
-
         return ver;
     }
 
@@ -132,8 +148,47 @@ public class MeshData {
         return ver;
     }
 
+    public float[] getNormals() {
+        float nor[] = new float[normals.size() * 4];
+
+        for (int i = 0; i < normals.size() * 4; i += 4) {
+            nor[i] = normals.get(i / 4).getX();
+            nor[i + 1] = normals.get(i / 4).getY();
+            nor[i + 2] = normals.get(i / 4).getZ();
+            nor[i + 3] = 0;
+        }
+
+        return nor;
+    }
+
+    public void addNormals(Vector3f... n) {
+        for (int i = 0; i < n.length; i++) {
+            normals.add(n[i]);
+        }
+    }
+
+    public void setNormals(List<Vector3f> normals) {
+        this.normals = normals;
+    }
+
+    public boolean isCalulateNormals() {
+        return calulateNormals;
+    }
+
+    public void setCalulateNormals(boolean calulateNormals) {
+        this.calulateNormals = calulateNormals;
+    }
+
     public List<Vector3f> getVertices() {
         return vertices;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     public int indexCount() {
@@ -141,7 +196,12 @@ public class MeshData {
     }
 
     public void compile() {
-        vbo = new VertexBufferObject(getVerticies(), getColors(), getIndecies());
+        if (calulateNormals) {
+            calulateNormals();
+            vbo = new VertexBufferObject(getVerticies(), getColors(), getNormals(), getIndecies());
+        } else {
+            vbo = new VertexBufferObject(getVerticies(), getColors(), getIndecies());
+        }
         vbo.createBuffers();
         vbo.uploadBuffer();
     }
@@ -152,5 +212,8 @@ public class MeshData {
 
     public int vertexCount() {
         return vertices.size() * 2;
+    }
+
+    public void calulateNormals() {
     }
 }

@@ -33,15 +33,30 @@ package org.jgui.render;
 
 import org.jgui.render.mesh.Mesh;
 import org.jgui.scene.node.Element;
+import org.jgui.util.FPS;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.*;
+import org.lwjgl.util.vector.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class OpenGLRenderer implements IRenderer {
 
     private Logger logger = LoggerFactory.getLogger(OpenGLRenderer.class);
+
+    /**
+     * This is a experimental rendering scheme for primitives
+     */
+    private Mesh line;
+    private Shader lineShader;
+
+    // FPS monitoring
+    private FPS fps;
+    int lastFPS = 0;
 
     @Override
     public void renderImage() {
@@ -52,6 +67,20 @@ public class OpenGLRenderer implements IRenderer {
     public void initialize() {
         glClearColor(43f / 255f, 43f / 255f, 43f / 255f, 0f);
         glViewport(0, 0, Display.defaultWidth, Display.defaultHeight);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
+        line = new Mesh();
+        line.getMesh().addVerticies(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
+        line.getMesh().addColor(new Color(0x0000000));
+
+
+        lineShader = new Shader("", "");
 
         logger.info("Initialized OpenGL");
     }
@@ -94,11 +123,60 @@ public class OpenGLRenderer implements IRenderer {
         GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
+        if (mesh.getMesh().getVbo().hasNormals()) {
+            GL20.glEnableVertexAttribArray(2);
+        }
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
 
 //        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
         GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+        if (mesh.getMesh().getVbo().hasNormals()) {
+            GL20.glDisableVertexAttribArray(2);
+        }
+
+        GL30.glBindVertexArray(0);
+
+        shader.unBind();
+    }
+
+    public void renderMesh(Mesh mesh, Shader shader, int renderMode) {
+        shader.bind();
+
+        GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
+
+//        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+        GL11.glDrawElements(renderMode, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+
+        GL30.glBindVertexArray(0);
+
+        shader.unBind();
+    }
+
+    public void renderGeometryMesh(Mesh mesh, Shader shader, int renderMode) {
+        shader.bind();
+
+        GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
+
+//        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+//        GL11.glDrawElements(renderMode, mesh.getMesh().indexCount(), GL11.GL_UNSIGNED_BYTE, 0);
+        GL11.glDrawArrays(renderMode, 0, mesh.getMesh().vertexCount());
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
@@ -116,7 +194,7 @@ public class OpenGLRenderer implements IRenderer {
 
     @Override
     public void clearBuffers() {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public static void clear() {
@@ -140,6 +218,46 @@ public class OpenGLRenderer implements IRenderer {
 
     @Override
     public void disableScissor() {
+
+    }
+
+    @Override
+    public void setUpMonitoring() {
+        fps = new FPS();
+
+        // FPS control don't delete
+        fps.initialize();
+    }
+
+    @Override
+    public void updateMonitoring() {
+        // Calculates whether or not to print the fps
+        if (lastFPS != fps.getFPS()) {
+//                System.out.println(fps.getFPS());
+            lastFPS = fps.getFPS();
+        }
+    }
+
+    public void renderPrimiteLine(float x1, float y1, float x2, float y2, Color color) {
+
+    }
+
+    public void listPossibleDisplaySizes() {
+        /**
+         * DisplayMode listing
+         */
+        org.lwjgl.opengl.DisplayMode[] modes = new org.lwjgl.opengl.DisplayMode[0];
+        try {
+            modes = org.lwjgl.opengl.Display.getAvailableDisplayModes();
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
+
+        for (int i=0;i<modes.length;i++) {
+            org.lwjgl.opengl.DisplayMode current = modes[i];
+            //System.out.println(current.getWidth() + "x" + current.getHeight() + "x" +
+            //current.getBitsPerPixel() + " " + current.getFrequency() + "Hz");
+        }
 
     }
 }

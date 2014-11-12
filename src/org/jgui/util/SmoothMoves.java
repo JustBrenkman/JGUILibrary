@@ -29,49 +29,56 @@
  *
  */
 
-package org.jgui.render;
-
-import org.jgui.render.mesh.Mesh;
-import org.jgui.scene.node.Element;
+package org.jgui.util;
 
 /**
- * Created by ben on 25/08/14.
+ * Created by ben on 29/10/14.
  */
-public interface IRenderer {
+public class SmoothMoves {
 
-    public void initialize();
+    private int current;
+    private int target;
+    private int increment = 5;
 
-    public void renderImage();
+    public int getCurrent() {
+        return current;
+    }
 
-    public void renderLine();
+    private void setCurrent(int current) {
+        this.current = current;
+    }
 
-    public void renderRectangle();
+    public int getTarget() {
+        return target;
+    }
 
-    public void renderTriangle();
+    public void setTarget(int target) {
+        this.target = target;
+    }
 
-    public void renderCircle();
+    public int getIncrement() {
+        return increment;
+    }
 
-    public void renderVBO();
+    public void setIncrement(int increment) {
+        this.increment = increment;
+    }
 
-    public void setFrameBuffer();
+    public void update() {
 
-    public void renderMesh(Mesh mesh, Shader shader);
+        if ((getTarget() - getIncrement()) > getTarget() && getTarget() > (getTarget() + getIncrement())) {
 
-    public void renderElement(Element element);
+            setCurrent(getTarget());
 
-    public void clearBuffers();
+            return;
+        }
 
-    public void uploadVBO();
+        if (getCurrent() > getTarget()) {
+            setCurrent(getCurrent() - getIncrement());
+        } else if (getCurrent() < getTarget()) {
+            setCurrent(getCurrent() + getIncrement());
+        }
 
-    public void shutDown();
-
-    public void enableScissor(int x, int y, int width, int height);
-
-    public void disableScissor();
-
-    public void setUpMonitoring();
-
-    public void updateMonitoring();
-
-//    public void setInternalResolution();
+//        setCurrent(getTarget());
+    }
 }

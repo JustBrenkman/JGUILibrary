@@ -31,6 +31,8 @@
 
 package org.jgui.render.mesh;
 
+import org.jgui.scene.node.appearance.*;
+
 /**
  * Created by ben on 26/08/14.
  */
@@ -38,12 +40,22 @@ public class Mesh {
 
     private MeshData mesh;
 
+    private Material material;
+
     public Mesh() {
         mesh = new MeshData();
     }
 
     public MeshData getMesh() {
         return mesh;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+       mesh.setMaterial(material);
     }
 
     public void destroy() {

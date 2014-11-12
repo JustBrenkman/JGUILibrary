@@ -5,6 +5,8 @@
       <root url="jar://$PROJECT_DIR$/lib/slf4j-simple-1.7.7.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ideaLibSources/slf4j-api-1.7.7-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
