@@ -31,7 +31,9 @@
 
 package org.jgui.util;
 
+import org.jgui.scene.transform.Quaternion;
 import org.jgui.scene.transform.Transform;
+import org.jgui.scene.transform.Vector3fMath;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
@@ -61,14 +63,11 @@ public class Camera {
 
     float frustum_length = far_plane - near_plane;
 
-    private Vector3f forward;
-    private Vector3f up;
-
     public Camera(Vector3f forward, Vector3f up) {
         this();
 
-        forward.normalise(forward);
-        up.normalise(up);
+        forward.normalise();
+        up.normalise();
     }
 
     public Camera(Vector3f position) {
@@ -81,47 +80,31 @@ public class Camera {
         orthoTransform.setTranslation(new Vector3f(0, 0, 0));
         projectionMatrix = new Matrix4f();
         orthoGraphicMatrix = new Matrix4f();
-
-        forward = new Vector3f(0, 0, 1);
-        up = new Vector3f(0, 1, 0);
-
-        forward.normalise(forward);
-        up.normalise(up);
-    }
-
-    public Vector3f getForward() {
-        return forward;
-    }
-
-    public void setForward(Vector3f forward) {
-        this.forward = forward;
-    }
-
-    public Vector3f getUp() {
-        return up;
-    }
-
-    public void setUp(Vector3f up) {
-        this.up = up;
     }
 
     public void move(Vector3f dir, float amount) {
-        Vector3f.add(new Vector3f(dir.getX() * amount, dir.getY() * amount, dir.getZ() * amount), transform.getTranslation(), transform.getTranslation());
+//        Vector3f.add(new Vector3f(dir.getX() * amount, dir.getY() * amount, dir.getZ() * amount), transform.getTranslation(), transform.getTranslation());
+        getTransform().setTranslation(Vector3fMath.add(getTransform().getTranslation(), Vector3fMath.multiply(dir, amount)));
     }
 
-    public Vector3f getLeft() {
-        Vector3f left = new Vector3f();
-        Vector3f.cross(up, forward, left);
-        left.normalise(left);
-        return left;
+    public void rotate(float amount, Axis axis) {
+        switch (axis) {
+            case X_AXIS:
+                transform.rotate(new Vector3f(0, 0, 1), amount);
+                break;
+            case Y_AXIS:
+                transform.rotate(new Vector3f(0, 1, 0), amount);
+                break;
+            case Z_AXIS:
+                transform.setRotation(new Vector3f(transform.getRotation().getX(), transform.getRotation().getY(), amount + transform.getRotation().getZ()));
+                break;
+            case W_AXIS:
+                break;
+            default:
+                break;
+        }
     }
 
-    public Vector3f getRight() {
-        Vector3f right = new Vector3f();
-        Vector3f.cross(forward, up, right);
-        right.normalise(right);
-        return right;
-    }
 
     private float coTangent(float angle) {
         return (float)(1f / Math.tan(angle));
@@ -213,23 +196,5 @@ public class Camera {
         mat.m33 = 1.0f;
 
         return mat;
-    }
-
-    public void rotate(float amount, Axis axis) {
-        switch (axis) {
-            case X_AXIS:
-                transform.setRotation(new Vector3f(amount + transform.getRotation().getX(), transform.getRotation().getY(), transform.getRotation().getZ()));
-                break;
-            case Y_AXIS:
-                transform.setRotation(new Vector3f(transform.getRotation().getX(), amount + transform.getRotation().getY(), transform.getRotation().getZ()));
-                break;
-            case Z_AXIS:
-                transform.setRotation(new Vector3f(transform.getRotation().getX(), transform.getRotation().getY(), amount + transform.getRotation().getZ()));
-                break;
-            case W_AXIS:
-                break;
-            default:
-                break;
-        }
     }
 }

@@ -31,6 +31,7 @@
 
 package org.jgui.scene.transform;
 
+import org.lwjgl.util.vector.Matrix;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -45,11 +46,14 @@ public class Transform {
 
     private Vector3f rotation = new Vector3f(0, 0, 0);
 
+    private Quaternion q_rotation;
+
     private Matrix4f modelMatrix;
 
     public Transform() {
         modelMatrix = new Matrix4f();
         translation = new Vector3f(0, 0, 0);
+        q_rotation = new Quaternion(0, 0, 0, 1);
     }
 
     public Transform(Vector3f translation) {
@@ -91,6 +95,14 @@ public class Transform {
         this.rotation = rotation;
     }
 
+    public Quaternion getQ_rotation() {
+        return q_rotation;
+    }
+
+    public void setQ_rotation(Quaternion q_rotation) {
+        this.q_rotation = q_rotation;
+    }
+
     public void updateTransformation() {
         modelMatrix = new Matrix4f();
         Matrix4f.scale(scale, modelMatrix, modelMatrix);
@@ -101,12 +113,26 @@ public class Transform {
     }
 
     public void updateCameraTransformation() {
+//        modelMatrix = new Matrix4f();
+//        Matrix4f.scale(scale, modelMatrix, modelMatrix);
+//
+//        float eX = (float) Math.atan2(-2 * (q_rotation.getY() * q_rotation.getZ() - q_rotation.getW() * q_rotation.getX()), q_rotation.getW() * q_rotation.getW() - q_rotation.getX() * q_rotation.getX() - q_rotation.getY() * q_rotation.getY() + q_rotation.getZ() * q_rotation.getZ());
+//        float eY = (float) Math.asin(2 * (q_rotation.getX() * q_rotation.getZ() + q_rotation.getW() * q_rotation.getY()));
+//        float eZ = (float) Math.atan2(-2 * (q_rotation.getX() * q_rotation.getY() - q_rotation.getW() * q_rotation.getZ()), q_rotation.getW() * q_rotation.getW() + q_rotation.getX() * q_rotation.getX() - q_rotation.getY() * q_rotation.getY() - q_rotation.getZ() * q_rotation.getZ());
+//
+//        Matrix4f.rotate(eX, new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
+//        Matrix4f.rotate(eY, new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
+//        Matrix4f.rotate(eZ, new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+//        Matrix4f.translate(translation, modelMatrix, modelMatrix);
+        updateCameraTransfomationWithQuaternion();
+    }
+
+    public void updateCameraTransfomationWithQuaternion() {
         modelMatrix = new Matrix4f();
-        Matrix4f.scale(scale, modelMatrix, modelMatrix);
-        Matrix4f.rotate(rotation.getX(), new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
-        Matrix4f.rotate(rotation.getY(), new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
-        Matrix4f.rotate(rotation.getZ(), new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
-        Matrix4f.translate(translation, modelMatrix, modelMatrix);
+        Matrix4f cameraRotatoin = q_rotation.conjugate().toRotationMatrix();
+        Vector3f cameraPos = Vector3fMath.multiply(translation, -1);
+        Matrix4f cameraTranslation = new Matrix4f().translate(translation);
+        Matrix4f.mul(modelMatrix, Matrix4f.mul(cameraRotatoin, cameraTranslation, cameraRotatoin), modelMatrix);
     }
 
     public Matrix4f getModelMatrix() {
@@ -115,5 +141,9 @@ public class Transform {
 
     public void setModelMatrix(Matrix4f modelMatrix) {
         this.modelMatrix = modelMatrix;
+    }
+
+    public void rotate(Vector3f axis, float amount) {
+        q_rotation = new Quaternion(axis, amount).multiply(q_rotation).normalize();
     }
 }

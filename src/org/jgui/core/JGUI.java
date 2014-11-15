@@ -158,24 +158,32 @@ public class JGUI {
         while (!display.isCloseRequested()) {
 
             if(Keyboard.isKeyDown(Keyboard.KEY_W))
-                camera.move(new Vector3f(0, 0, 1), 0.1f);
+                camera.move(camera.getTransform().getQ_rotation().getForward(), 0.1f);
             if(Keyboard.isKeyDown(Keyboard.KEY_S))
-                camera.move(new Vector3f(0, 0, -1), 0.1f);
+                camera.move(camera.getTransform().getQ_rotation().getForward(), -0.1f);
             if(Keyboard.isKeyDown(Keyboard.KEY_A))
-                camera.move(new Vector3f(1, 0, 0), 0.1f);
+                camera.move(camera.getTransform().getQ_rotation().getRight(), 0.1f);
             if(Keyboard.isKeyDown(Keyboard.KEY_D))
-                camera.move(new Vector3f(-1, 0, 0), 0.1f);
+                camera.move(camera.getTransform().getQ_rotation().getLeft(), 0.1f);
 
-            if(Keyboard.isKeyDown(Keyboard.KEY_UP))
-                camRot.setZ(camRot.getZ() - 0.01f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-                camRot.setZ(camRot.getZ() + 0.01f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_LEFT))
-                camRot.setY(camRot.getY() - 0.01f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
-                camRot.setY(camRot.getY() + 0.01f);
+            if(Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+//                camRot.setZ(camRot.getZ() - 0.01f);
+                camera.rotate(camera.degreesToRadians(1), Axis.X_AXIS);
+            }
+            if(Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+//                camRot.setZ(camRot.getZ() + 0.01f);
+                camera.rotate(-camera.degreesToRadians(1), Axis.X_AXIS);
+            }
+            if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+//                camRot.setY(camRot.getY() - 0.01f);
+                camera.rotate(camera.degreesToRadians(1), Axis.Y_AXIS);
+            }
+            if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+//                camRot.setY(camRot.getY() + 0.01f);
+                camera.rotate(-camera.degreesToRadians(1), Axis.Y_AXIS);
+            }
 
-            camera.getTransform().setRotation(camRot);
+//            camera.getTransform().setRotation(camRot);
 
             renderer.clearBuffers();
 
@@ -202,7 +210,7 @@ public class JGUI {
 
 
             // Reset the Camera up for Orthographics
-            camera.getTransform().setRotation(new Vector3f(0, 0, 0));
+//            camera.getTransform().setRotation(new Vector3f(0, 0, 0));
             camera.getTransform().updateTransformation();
 
             // Render 2D stuff here
