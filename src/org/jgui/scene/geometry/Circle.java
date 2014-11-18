@@ -59,8 +59,8 @@ public class Circle {
     private int numOfSlices = 9;
 
 //    private byte[] indecies = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 9, 0, 9, 10, 0, 10, 11};
-    private byte[] indecies = {0};
-    private byte[] indeciesForPionts = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    private int[] indecies = {0};
+    private int[] indeciesForPionts = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 //    private byte[] indecies = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 7, 8, 0, 9, 10, 0, 10, 1};
 
     public Circle(int radius) {

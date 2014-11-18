@@ -32,28 +32,38 @@
 package org.jgui.render;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.opengl.*;
+import org.lwjgl.util.vector.Vector2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Display {
+public class DisplayManager {
 
     public static final int defaultWidth = 800;
 //    public static final int defaultWidth = 1600;
     public static final int defaultHeight = 600;
 //    public static final int defaultHeight = 900;
 
+    private static int height;
+    private static int width;
+
     public boolean fullscreen = false;
+
+    private static Vector2f centerPosition;
 
     private String title = "Window";
 
     Logger logger;
 
-    public Display() {
-        logger = LoggerFactory.getLogger(Display.class);
+    public DisplayManager() {
+        this(defaultWidth, defaultHeight);
+    }
+
+    public DisplayManager(int width, int height) {
+        logger = LoggerFactory.getLogger(DisplayManager.class);
+        centerPosition = new Vector2f();
+        setWidth(width);
+        setHeight(height);
     }
 
     public void Display(boolean full) {
@@ -64,13 +74,13 @@ public class Display {
         try {
             PixelFormat pixelFormat = new PixelFormat();
             ContextAttribs contextAtrributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true);
-            org.lwjgl.opengl.Display.setDisplayMode(new DisplayMode(defaultWidth, defaultHeight));
-            org.lwjgl.opengl.Display.setTitle("JGUI");
-            org.lwjgl.opengl.Display.create(pixelFormat, contextAtrributes);
+            Display.setDisplayMode(new DisplayMode(getWidth(), getHeight()));
+            Display.setTitle("JGUI");
+            Display.create(pixelFormat, contextAtrributes);
 
-            GL11.glViewport(0, 0, defaultWidth, defaultHeight);
+            GL11.glViewport(0, 0, width, height);
 
-            logger.info("Created Display: " + defaultWidth + " X " + defaultHeight);
+            logger.info("Created Display: " + width + " X " + height);
         } catch (LWJGLException e) {
             e.printStackTrace();
         }
@@ -81,20 +91,42 @@ public class Display {
     }
 
     public void destroy() {
-        org.lwjgl.opengl.Display.destroy();
+        Display.destroy();
     }
 
     public void update() {
-        org.lwjgl.opengl.Display.update();
+        Display.update();
     }
 
     public void sync(int sync) {
-        org.lwjgl.opengl.Display.sync(sync);
+        Display.sync(sync);
     }
 
-//    public void setRenderer(IRenderer irenderer) {
-//
-//    }
+    public static int getHeight() {
+        return height;
+    }
+
+    public static void setHeight(int height) {
+        DisplayManager.height = height;
+        centerPosition.setY(height / 2);
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
+    public static void setWidth(int width) {
+        DisplayManager.width = width;
+        centerPosition.setX(width / 2);
+    }
+
+    public boolean isFullscreen() {
+        return fullscreen;
+    }
+
+    public void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
+    }
 
     public String getTitle() {
         return title;
@@ -104,7 +136,11 @@ public class Display {
         this.title = title;
     }
 
+    public static Vector2f getCenterPosition() {
+        return centerPosition;
+    }
+
     public boolean isCloseRequested() {
-        return org.lwjgl.opengl.Display.isCloseRequested();
+        return Display.isCloseRequested();
     }
 }

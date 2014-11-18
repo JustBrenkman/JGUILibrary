@@ -105,7 +105,7 @@ public class Line {
         mesh.getMesh().addVerticies(point1, point2);
 //        mesh.getMesh().addVerticies(new Vector3f(0, 0, 0), new Vector3f(100, 0, 0));
         mesh.setMaterial(material);
-        byte[] ind = {0, 1};
+        int[] ind = {0, 1};
         mesh.getMesh().addIndecies(ind);
         mesh.getMesh().compile();
 
@@ -124,6 +124,28 @@ public class Line {
         shader.updateUniformMatrix4("modelMatrix", transform.getModelMatrix());
         shader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
         shader.updateUniformMatrix4("viewMatrix", camera.getOrthoTransformation());
+        shader.unBind();
+
+        renderer.renderMesh(mesh, shader, GL11.GL_LINES);
+    }
+
+    public void experimentalRender(Camera camera, OpenGLRenderer renderer) {
+        shader.bind();
+        transform.updateTransformation();
+        shader.updateUniformMatrix4("modelMatrix", transform.getTransformationMatrix());
+        shader.updateUniformMatrix4("projectionMatrix", camera.getOrthoGraphicMatrix());
+        shader.updateUniformMatrix4("viewMatrix", camera.getOrthoTransformation());
+        shader.unBind();
+
+        renderer.renderMesh(mesh, shader, GL11.GL_LINES);
+    }
+
+    public void render(Camera camera, OpenGLRenderer renderer) {
+        shader.bind();
+        transform.updateTransformation();
+        shader.updateUniformMatrix4("modelMatrix", transform.getModelMatrix());
+        shader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+        shader.updateUniformMatrix4("viewMatrix", camera.getViewMatrix());
         shader.unBind();
 
         renderer.renderMesh(mesh, shader, GL11.GL_LINES);

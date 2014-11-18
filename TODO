@@ -108,4 +108,5 @@ Add class to make the changing of variables smooth, example scrolling.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Use geometry shaders to draw primitives
+Use geometry shaders to draw primitives.
+Change Transform completly over to quaternion rotations and cleanup and refactor code.

@@ -57,7 +57,7 @@ public class Box {
 
     public Transform transform;
 
-    public byte[] indecies = {0, 1, 2, 2, 3, 0};
+    public int[] indecies = {0, 1, 2, 2, 3, 0};
 
     public Color color;
 

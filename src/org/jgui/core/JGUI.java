@@ -33,28 +33,29 @@ package org.jgui.core;
 
 import org.jgui.eventbus.EventBusService;
 import org.jgui.events.ShutDownEvent;
+import org.jgui.render.DisplayManager;
 import org.jgui.render.mesh.Mesh;
-import org.jgui.render.Display;
 import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
+import org.jgui.scene.geometry.Line;
 import org.jgui.scene.node.appearance.Material;
 import org.jgui.scene.transform.Transform;
+import org.jgui.scene.transform.Vector3fMath;
 import org.jgui.util.*;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
 
 public class JGUI {
 
-    Display display;
+    DisplayManager display;
 
     private OpenGLRenderer renderer;
 
     public JGUI() {
-        display = new Display();
+        display = new DisplayManager();
 
         renderer = new OpenGLRenderer();
 
@@ -127,7 +128,7 @@ public class JGUI {
                 new Vector3f(0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f, 0.5f, -0.5f)); // Left
         Material mat = new Material(Color.BLUE);
         box.setMaterial(mat);
-        byte[] index = {0, 1, 2, 0, 2, 3,       // Front
+        int[] index = {0, 1, 2, 0, 2, 3,       // Front
                        4, 6, 5, 4, 7, 6,        // Back
                        8, 9, 10, 8, 10, 11,     // Right
                        12, 15, 13, 12, 14, 15,  // Bottom
@@ -143,60 +144,101 @@ public class JGUI {
         box.getMesh().setCalulateNormals(true);
         box.getMesh().compile();
 
-        float rot = 0;
-        Vector3f camRot = new Vector3f(0, 0, 0);
+        Transform planeTransform = new Transform(new Vector3f(0, 0, 0));
+        planeTransform.updateTransformation();
 
-        Vector3f lightPos = new Vector3f(0, 0, 1);
+        Mesh plane = new Mesh();
+        plane.getMesh().addVerticies(new Vector3f(-10, 0, 10), new Vector3f(10, 0, 10), new Vector3f(10, 0, -10), new Vector3f(-10, 0, -10));
+        plane.getMesh().addNormals(new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0));
+        box.getMesh().setCalulateNormals(true);
+        Material plane_Material = new Material(Color.RED);
+        plane.setMaterial(plane_Material);
+        int[] indecies = {0, 1, 2, 0, 2, 3};
+        plane.getMesh().addIndecies(indecies);
+        plane.getMesh().compile();
+
+        float rot = 0;
+
+
+        Vector3f lightPos = new Vector3f(0, -100, 0);
         Vector3f lightCol = new Vector3f(1, 1, 1);
 
-        float lastMouseX = Mouse.getX();
-        float lastMouseY = Mouse.getY();
+        Line line = new Line(new Vector3f(0, -100, 0), new Vector3f(0, 100, 0), new Material(Color.GREEN));
+        line.build();
+        Line line1 = new Line(new Vector3f(-100, 0, 0), new Vector3f(1000, 0, 0), new Material(Color.BLUE));
+        line1.build();
+        Line line2 = new Line(new Vector3f(0, 0, -100), new Vector3f(0, 0, 100), new Material(Color.RED));
+        line2.build();
 
         /**
          * main loop
          */
         while (!display.isCloseRequested()) {
 
-            if(Keyboard.isKeyDown(Keyboard.KEY_W))
-                camera.move(camera.getTransform().getQ_rotation().getForward(), 0.1f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_S))
-                camera.move(camera.getTransform().getQ_rotation().getForward(), -0.1f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_A))
-                camera.move(camera.getTransform().getQ_rotation().getRight(), 0.1f);
-            if(Keyboard.isKeyDown(Keyboard.KEY_D))
-                camera.move(camera.getTransform().getQ_rotation().getLeft(), 0.1f);
+            Vector2f centerPosition = DisplayManager.getCenterPosition();
 
-            if(Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-//                camRot.setZ(camRot.getZ() - 0.01f);
-                camera.rotate(camera.degreesToRadians(1), Axis.X_AXIS);
+            ///////////////////////// Mouse locked code /////////////////////////
+            if (Input.isKeyDown(Input.KEY_ESCAPE))
+                Input.setCursorGrabbed(false);
+
+            if (Input.getMouseDown(0)) {
+                Input.setMousePosition(centerPosition);
+                Input.setCursorGrabbed(true);
             }
-            if(Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-//                camRot.setZ(camRot.getZ() + 0.01f);
-                camera.rotate(-camera.degreesToRadians(1), Axis.X_AXIS);
+
+            if(Input.isKeyDown(Input.KEY_W))
+                camera.move(camera.getTransform().getQ_rotation().getForward(), 0.1f);
+            if(Input.isKeyDown(Input.KEY_S))
+                camera.move(camera.getTransform().getQ_rotation().getForward(), -0.1f);
+            if(Input.isKeyDown(Input.KEY_A))
+                camera.move(camera.getTransform().getQ_rotation().getRight(), 0.1f);
+            if(Input.isKeyDown(Input.KEY_D))
+                camera.move(camera.getTransform().getQ_rotation().getLeft(), 0.1f);
+            if (Input.isKeyDown(Input.KEY_SPACE))
+                camera.move(camera.getTransform().getQ_rotation().getDown(), 0.1f);
+            if (Input.isKeyDown(Input.KEY_LSHIFT))
+                camera.move(camera.getTransform().getQ_rotation().getUp(), 0.1f);
+
+            if(Input.isKeyDown(Input.KEY_UP)) {
+                camera.rotate(camera.degreesToRadians(1), camera.getTransform().getQ_rotation().getRight());
             }
-            if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-//                camRot.setY(camRot.getY() - 0.01f);
+            if(Input.isKeyDown(Input.KEY_DOWN)) {
+                camera.rotate(camera.degreesToRadians(1), camera.getTransform().getQ_rotation().getLeft());
+            }
+            if(Input.isKeyDown(Input.KEY_LEFT)) {
                 camera.rotate(camera.degreesToRadians(1), Axis.Y_AXIS);
             }
-            if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-//                camRot.setY(camRot.getY() + 0.01f);
+            if(Input.isKeyDown(Input.KEY_RIGHT)) {
                 camera.rotate(-camera.degreesToRadians(1), Axis.Y_AXIS);
             }
 
-//            camera.getTransform().setRotation(camRot);
+            if (Input.isCursorGrabbed()) {
+                Vector3f deltaPos = Vector3fMath.subtract(Input.getMousePosition(), new Vector3f(centerPosition.getX(), centerPosition.getY(), 0));
+
+                boolean rotY = deltaPos.getX() != 0;
+                boolean rotX = deltaPos.getY() != 0;
+
+                if (rotY)
+                    camera.rotate(camera.degreesToRadians(-deltaPos.getX() * 0.1f), Axis.Y_AXIS);
+                if (rotX)
+                      camera.rotate(camera.degreesToRadians(deltaPos.getY() * 0.1f), camera.getTransform().getQ_rotation().getRight());
+//                    camera.rotate(camera.degreesToRadians(-deltaPos.getY() * 0.3f), Axis.X_AXIS);
+                if (rotY || rotX)
+                    Input.setMousePosition(centerPosition);
+            }
+
+            Input.update();
 
             renderer.clearBuffers();
-
-//            camRot.setY(camRot.getY() + 0.01f);
-
-//            camera.getTransform().setRotation(camRot);
-//            camera.getTransform().updateTransformation();
 
             // Render 3D stuff here
             rot += 1f;
             transform.setRotation(new Vector3f(camera.degreesToRadians(rot), camera.degreesToRadians(rot), camera.degreesToRadians(rot)));
             camera.updateTransform();
 
+            planeTransform.rotate(new Vector3f(1, 0, 0), 0.1f);
+
+            // Render the box
             shader.bind();
             transform.updateTransformation();
             shader.updateUniformMatrix4("modelMatrix", transform.getModelMatrix());
@@ -208,9 +250,21 @@ public class JGUI {
 
             renderer.renderMesh(box, shader);
 
+//            // Render the plane
+            shader.bind();
+            shader.updateUniformMatrix4("modelMatrix", planeTransform.getTransformationMatrix());
+            shader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            shader.updateUniformMatrix4("viewMatrix", camera.getViewMatrix());
+            shader.updateUniformVector3f("light_Pos", lightPos);
+            shader.updateUniformVector3f("light_Col", lightCol);
+            shader.unBind();
+
+            renderer.renderMesh(plane, shader);
+            line.render(camera, renderer);
+            line1.render(camera, renderer);
+            line2.render(camera, renderer);
 
             // Reset the Camera up for Orthographics
-//            camera.getTransform().setRotation(new Vector3f(0, 0, 0));
             camera.getTransform().updateTransformation();
 
             // Render 2D stuff here

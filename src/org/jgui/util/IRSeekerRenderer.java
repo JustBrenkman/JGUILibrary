@@ -39,11 +39,15 @@ import org.jgui.scene.geometry.Box;
 import org.jgui.scene.geometry.Circle;
 import org.jgui.scene.geometry.Line;
 import org.jgui.scene.node.appearance.Material;
+import org.jgui.scene.transform.Quaternion;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by ben on 28/10/14.
@@ -52,19 +56,21 @@ public class IRSeekerRenderer {
 
     private OpenGLRenderer renderer;
 
+    private ArrayList<IRSensor> boxes = new ArrayList<>();
+
     private Camera camera;
 
-    private Box sensor1;
-    private Box sensor2;
-    private Box sensor3;
-    private Box sensor4;
-    private Box sensor5;
+    private IRSensor sensor1;
+    private IRSensor sensor2;
+    private IRSensor sensor3;
+    private IRSensor sensor4;
+    private IRSensor sensor5;
 
-    private Box sensor6;
-    private Box sensor7;
-    private Box sensor8;
-    private Box sensor9;
-    private Box sensor10;
+    private IRSensor sensor6;
+    private IRSensor sensor7;
+    private IRSensor sensor8;
+    private IRSensor sensor9;
+    private IRSensor sensor10;
 
 //    private Box sensor11;
 //    private Box sensor12;
@@ -100,47 +106,47 @@ public class IRSeekerRenderer {
     public void initialize() {
         EventBusService.subscribe(this);
 
-        sensor1 = new Box(0, 0, 49, 50);
+        sensor1 = new IRSensor(0, 0, 49, 10, 0);
         sensor1.setColor(new Color(0xe51c23));
         sensor1.build();
 
-        sensor2 = new Box(50, 0, 49, 50);
+        sensor2 = new IRSensor(50, 0, 49, 20, 1);
         sensor2.setColor(new Color(0xe91e63));
         sensor2.build();
 
-        sensor3 = new Box(100, 0, 49, 100);
+        sensor3 = new IRSensor(100, 0, 49, 30, 2);
         sensor3.setColor(new Color(0x9c27b0));
         sensor3.build();
 
-        sensor4 = new Box(150, 0, 49, 100);
+        sensor4 = new IRSensor(150, 0, 49, 40, 3);
         sensor4.setColor(new Color(0x673ab7));
         sensor4.build();
 
-        sensor5 = new Box(200, 0, 49, 100);
+        sensor5 = new IRSensor(200, 0, 49, 50, 4);
         sensor5.setColor(new Color(0x3f51b5));
         sensor5.build();
 
-        sensor1Dir = new Box(0, 250, 49, 20);
+        sensor1Dir = new IRSensor(0, 250, 49, 20, 20);
         sensor1Dir.setColor(new Color(0x2AE52A));
         sensor1Dir.build();
 
-        sensor6 = new Box(Display.getWidth() - 250, 0, 49, 50);
+        sensor6 = new IRSensor(Display.getWidth() - 250, 0, 49, 50, 5);
         sensor6.setColor(new Color(0xe51c23));
         sensor6.build();
 
-        sensor7 = new Box(Display.getWidth() - 200, 0, 49, 50);
+        sensor7 = new IRSensor(Display.getWidth() - 200, 0, 49, 50, 6);
         sensor7.setColor(new Color(0xe91e63));
         sensor7.build();
 
-        sensor8 = new Box(Display.getWidth() - 150, 0, 49, 100);
+        sensor8 = new IRSensor(Display.getWidth() - 150, 0, 49, 100, 7);
         sensor8.setColor(new Color(0x9c27b0));
         sensor8.build();
 
-        sensor9 = new Box(Display.getWidth() - 100, 0, 49, 100);
+        sensor9 = new IRSensor(Display.getWidth() - 100, 0, 49, 100, 8);
         sensor9.setColor(new Color(0x673ab7));
         sensor9.build();
 
-        sensor10 = new Box(Display.getWidth() - 50, 0, 49, 100);
+        sensor10 = new IRSensor(Display.getWidth() - 50, 0, 49, 100, 9);
         sensor10.setColor(new Color(0x3F51B5));
         sensor10.build();
 
@@ -162,8 +168,16 @@ public class IRSeekerRenderer {
         circle.setColor(new Color(0x00bcd4));
         circle.build();
 
-        line = new Line(new Vector3f(0, 0, 0), new Vector3f(125, 0, 0), new Material(Color.RED));
+        line = new Line(new Vector3f(0, 0, 0), new Vector3f(0, 125, 0), new Material(Color.RED));
         line.build();
+
+        boxes.add(sensor1);
+        boxes.add(sensor2);
+        boxes.add(sensor3);
+        boxes.add(sensor4);
+        boxes.add(sensor5);
+
+        updateLineRotation();
     }
 
     @EventHandler
@@ -201,6 +215,23 @@ public class IRSeekerRenderer {
         }
 
         isDirty = true;
+    }
+
+    private void updateLineRotation() {
+
+        int offsetInDegrees = 54;
+
+        Collections.sort(boxes, new Comparator<Box>() {
+            @Override
+            public int compare(Box box, Box box2) {
+                return box2.getHeight() - box.getHeight();
+            }
+        });
+
+        int id0 = boxes.get(0).getId() - 3;
+        offsetInDegrees *= id0;
+
+        line.getTransform().rotate(new Vector3f(0, 0, 1), (float) Math.toRadians(offsetInDegrees));
     }
 
     public void render() {
@@ -243,7 +274,10 @@ public class IRSeekerRenderer {
         sensor9.safeRender(camera, renderer);
         sensor10.safeRender(camera, renderer);
 
-        line.safeRender(camera, renderer);
+//        line.getTransform().rotate(new Vector3f(0, 0, 1), 0.1f);
+        updateLineRotation();
+        line.experimentalRender(camera, renderer);
+        line.getTransform().getQ_rotation().set(new Quaternion(0, 0, 0, 1));
 
 //        sensor1Dir.safeRender(camera, renderer);
 

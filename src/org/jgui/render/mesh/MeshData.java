@@ -46,7 +46,7 @@ public class MeshData {
 
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Color> colors = new ArrayList<>();
-    private List<Byte> indecies = new ArrayList<>();
+    private List<Integer> indecies = new ArrayList<>();
     private List<Vector3f> normals = new ArrayList<>();
     private Material material;
 
@@ -117,14 +117,14 @@ public class MeshData {
 
     }
 
-    public void addIndecies(byte[] indexs) {
+    public void addIndecies(int[] indexs) {
         for (int i = 0; i < indexs.length; i++) {
             indecies.add(indexs[i]);
         }
     }
 
-    public byte[] getIndecies() {
-        byte[] in = new byte[indecies.size()];
+    public int[] getIndecies() {
+        int[] in = new int[indecies.size()];
 
         for (int i = 0; i < indecies.size(); i++) {
             in[i] = indecies.get(i);

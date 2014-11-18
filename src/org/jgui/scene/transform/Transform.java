@@ -146,4 +146,14 @@ public class Transform {
     public void rotate(Vector3f axis, float amount) {
         q_rotation = new Quaternion(axis, amount).multiply(q_rotation).normalize();
     }
+
+    // TODO make main getModelMatrix;
+    public Matrix4f getTransformationMatrix() {
+        Matrix4f translationMatrix = new Matrix4f();
+        translationMatrix.translate(getTranslation());
+        Matrix4f rotationMatrix = q_rotation.toRotationMatrix();
+        Matrix4f scaleMatrix = new Matrix4f().scale(getScale());
+
+        return Matrix4f.mul(translationMatrix, Matrix4f.mul(rotationMatrix, scaleMatrix, rotationMatrix), translationMatrix);
+    }
 }

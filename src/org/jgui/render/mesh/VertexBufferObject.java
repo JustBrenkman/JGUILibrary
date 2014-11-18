@@ -36,6 +36,7 @@ import org.lwjgl.opengl.*;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /**
  * Created by ben on 26/08/14.
@@ -46,7 +47,7 @@ public class VertexBufferObject {
 
     private float[] colors;
 
-    private byte[] indecies;
+    private int[] indecies;
 
     private float[] normals;
 
@@ -66,7 +67,7 @@ public class VertexBufferObject {
 
     private FloatBuffer colorBuffer;
 
-    private ByteBuffer indexBuffer;
+    private IntBuffer indexBuffer;
 
     private FloatBuffer normalBuffer;
 
@@ -75,13 +76,13 @@ public class VertexBufferObject {
     // Random Coolness buffer ID
     private int rcoID;
 
-    public VertexBufferObject(float[] vertices, float[] colors, byte[] indecies) {
+    public VertexBufferObject(float[] vertices, float[] colors, int[] indecies) {
         setVertices(vertices);
         setIndecies(indecies);
         setColors(colors);
     }
 
-    public VertexBufferObject(float[] vertices, float[] colors, float[] normals, byte[] indecies) {
+    public VertexBufferObject(float[] vertices, float[] colors, float[] normals, int[] indecies) {
         this(vertices, colors, indecies);
         setNormals(normals);
         setHasNormals(true);
@@ -107,11 +108,11 @@ public class VertexBufferObject {
         this.colors = colors;
     }
 
-    public byte[] getIndecies() {
+    public int[] getIndecies() {
         return indecies;
     }
 
-    public void setIndecies(byte[] indecies) {
+    public void setIndecies(int[] indecies) {
         this.indecies = indecies;
     }
 
@@ -152,7 +153,7 @@ public class VertexBufferObject {
         colorBuffer.put(getColors());
         colorBuffer.flip();
 
-        indexBuffer = BufferUtils.createByteBuffer(indecies.length);
+        indexBuffer = BufferUtils.createIntBuffer(indecies.length);
         indexBuffer.put(indecies);
         indexBuffer.flip();
 

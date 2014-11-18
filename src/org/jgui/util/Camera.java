@@ -90,7 +90,7 @@ public class Camera {
     public void rotate(float amount, Axis axis) {
         switch (axis) {
             case X_AXIS:
-                transform.rotate(new Vector3f(0, 0, 1), amount);
+                transform.rotate(new Vector3f(1, 0, 0), amount);
                 break;
             case Y_AXIS:
                 transform.rotate(new Vector3f(0, 1, 0), amount);
@@ -103,6 +103,10 @@ public class Camera {
             default:
                 break;
         }
+    }
+
+    public void rotate(float amount, Vector3f vector3f) {
+        transform.rotate(vector3f, amount);
     }
 
 
