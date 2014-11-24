@@ -65,9 +65,12 @@ public class OpenGLRenderer implements IRenderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
-//
+
 //        glEnable(GL_CULL_FACE);
 //        glCullFace(GL_BACK);
+
+//        glPointSize(5f);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
         logger.info("Initialized OpenGL");
     }

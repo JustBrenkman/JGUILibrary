@@ -32,10 +32,10 @@
 package org.jgui.render.mesh;
 
 import org.jgui.scene.node.appearance.Material;
+import org.jgui.scene.transform.Vector3fMath;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
-import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,6 +148,10 @@ public class MeshData {
         return ver;
     }
 
+    public void setVertices(List<Vector3f> vertices) {
+        this.vertices = vertices;
+    }
+
     public float[] getNormals() {
         float nor[] = new float[normals.size() * 4];
 
@@ -165,6 +169,10 @@ public class MeshData {
         for (int i = 0; i < n.length; i++) {
             normals.add(n[i]);
         }
+    }
+
+    public void addNormal(Vector3f n) {
+        normals.add(n);
     }
 
     public void setNormals(List<Vector3f> normals) {
@@ -215,5 +223,32 @@ public class MeshData {
     }
 
     public void calulateNormals() {
+
+        if (normals.size() < indecies.size()) {
+            for (int i = 0; i < indecies.size(); i++) {
+                normals.add(new Vector3f());
+            }
+        }
+
+        for (int i = 0; i < indecies.size(); i += 3) {
+            int i0 = indecies.get(i);
+            int i1 = indecies.get(i + 1);
+            int i2 = indecies.get(i + 2);
+
+            Vector3f v1 = Vector3fMath.subtract(vertices.get(i1), vertices.get(i0));
+            Vector3f v2 = Vector3fMath.subtract(vertices.get(i2), vertices.get(i0));
+
+            Vector3f normal = Vector3fMath.cross(v1, v2);
+            normal.normalise(normal);
+
+//            System.out.println("Index number: " + i0);
+//            System.out.println("Index number: " + i1);
+//            System.out.println("Index number: " + i2);
+//            System.out.println("normals size: " + normals.size());
+
+            normals.set(i0, normal);
+            normals.set(i1, normal);
+            normals.set(i2, normal);
+        }
     }
 }

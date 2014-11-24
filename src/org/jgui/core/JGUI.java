@@ -34,6 +34,8 @@ package org.jgui.core;
 import org.jgui.eventbus.EventBusService;
 import org.jgui.events.ShutDownEvent;
 import org.jgui.render.DisplayManager;
+import org.jgui.render.mesh.Loaders.OBJLoader;
+import org.jgui.render.mesh.Loaders.OBJMesh;
 import org.jgui.render.mesh.Mesh;
 import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
@@ -108,7 +110,7 @@ public class JGUI {
         Transform transform = new Transform(new Vector3f(0, 0, -10));
         transform.updateTransformation();
 
-        Shader shader = new Shader("Experimental/Light/vs.glsl", "Experimental/Light/fs.glsl");
+        Shader shader = new Shader("Experimental/Light/vs_test.glsl", "Experimental/Light/fs_test.glsl");
 //        Shader shader = new Shader("vs.glsl", "fs.glsl");
         shader.loadShaders();
         shader.compile();
@@ -118,6 +120,11 @@ public class JGUI {
         shader.addUniform("viewMatrix");
         shader.addUniform("light_Pos");
         shader.addUniform("light_Col");
+        shader.addUniform("color");
+
+//        Mesh cube = OBJLoader.loadObJModel("stall");
+        Mesh land = OBJLoader.loadTestOBJModel("cube");
+        OBJMesh test = new OBJMesh("cube");
 
         Mesh box = new Mesh();
         box.getMesh().addVerticies(new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, 0.5f), // Front
@@ -126,7 +133,7 @@ public class JGUI {
                 new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(-0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, -0.5f), // Bottom
                 new Vector3f(-0.5f, 0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, -0.5f), new Vector3f(0.5f, 0.5f, -0.5f), // Top
                 new Vector3f(0.5f, -0.5f, -0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f, 0.5f, -0.5f)); // Left
-        Material mat = new Material(Color.BLUE);
+        Material mat = new Material(new Color(0xdb6a3c));
         box.setMaterial(mat);
         int[] index = {0, 1, 2, 0, 2, 3,       // Front
                        4, 6, 5, 4, 7, 6,        // Back
@@ -135,7 +142,7 @@ public class JGUI {
                        16, 17, 19, 16, 19, 18,  // Top
                        20, 22, 21, 20, 23, 22}; // Left
         box.getMesh().addIndecies(index);
-        box.getMesh().addNormals(new Vector3f(0, 0, 1), new Vector3f(0, 0, 1), new Vector3f(0, 0, 1), new Vector3f(0, 0, 1),
+        box.getMesh().addNormals(new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0),
                 new Vector3f(0, 0, -1), new Vector3f(0, 0, -1), new Vector3f(0, 0, -1), new Vector3f(0, 0, -1),
                 new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(-1, 0, 0),
                 new Vector3f(0, -1, 0), new Vector3f(0, -1, 0), new Vector3f(0, -1, 0), new Vector3f(0, -1, 0),
@@ -144,13 +151,13 @@ public class JGUI {
         box.getMesh().setCalulateNormals(true);
         box.getMesh().compile();
 
-        Transform planeTransform = new Transform(new Vector3f(0, 0, 0));
+        Transform planeTransform = new Transform(new Vector3f(0, -10, 0));
         planeTransform.updateTransformation();
 
         Mesh plane = new Mesh();
         plane.getMesh().addVerticies(new Vector3f(-10, 0, 10), new Vector3f(10, 0, 10), new Vector3f(10, 0, -10), new Vector3f(-10, 0, -10));
         plane.getMesh().addNormals(new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0));
-        box.getMesh().setCalulateNormals(true);
+        plane.getMesh().setCalulateNormals(true);
         Material plane_Material = new Material(Color.RED);
         plane.setMaterial(plane_Material);
         int[] indecies = {0, 1, 2, 0, 2, 3};
@@ -160,7 +167,7 @@ public class JGUI {
         float rot = 0;
 
 
-        Vector3f lightPos = new Vector3f(0, -100, 0);
+        Vector3f lightPos = new Vector3f(-20, 0, 0);
         Vector3f lightCol = new Vector3f(1, 1, 1);
 
         Line line = new Line(new Vector3f(0, -100, 0), new Vector3f(0, 100, 0), new Material(Color.GREEN));
@@ -170,12 +177,15 @@ public class JGUI {
         Line line2 = new Line(new Vector3f(0, 0, -100), new Vector3f(0, 0, 100), new Material(Color.RED));
         line2.build();
 
+        float g = 0;
+
         /**
          * main loop
          */
         while (!display.isCloseRequested()) {
 
             Vector2f centerPosition = DisplayManager.getCenterPosition();
+            g += 0.01f;
 
             ///////////////////////// Mouse locked code /////////////////////////
             if (Input.isKeyDown(Input.KEY_ESCAPE))
@@ -233,10 +243,11 @@ public class JGUI {
 
             // Render 3D stuff here
             rot += 1f;
-            transform.setRotation(new Vector3f(camera.degreesToRadians(rot), camera.degreesToRadians(rot), camera.degreesToRadians(rot)));
+            transform.setRotation(new Vector3f(0, camera.degreesToRadians(rot), 0));
             camera.updateTransform();
 
-            planeTransform.rotate(new Vector3f(1, 0, 0), 0.1f);
+//            planeTransform.rotate(new Vector3f(1, 0, 0), 0.1f);
+            planeTransform.setTranslation(new Vector3f(0, g - 10, 0));
 
             // Render the box
             shader.bind();
@@ -246,9 +257,12 @@ public class JGUI {
             shader.updateUniformMatrix4("viewMatrix", camera.getViewMatrix());
             shader.updateUniformVector3f("light_Pos", lightPos);
             shader.updateUniformVector3f("light_Col", lightCol);
+            shader.updateUniformVector3f("color", new Vector3f(0, 1, 0));
+            test.Draw();
             shader.unBind();
 
-            renderer.renderMesh(box, shader);
+//            renderer.renderMesh(box, shader);
+//            renderer.renderMesh(land, shader);
 
 //            // Render the plane
             shader.bind();
@@ -258,8 +272,8 @@ public class JGUI {
             shader.updateUniformVector3f("light_Pos", lightPos);
             shader.updateUniformVector3f("light_Col", lightCol);
             shader.unBind();
-
-            renderer.renderMesh(plane, shader);
+//
+//            renderer.renderMesh(land, shader);
             line.render(camera, renderer);
             line1.render(camera, renderer);
             line2.render(camera, renderer);
@@ -275,6 +289,8 @@ public class JGUI {
 
         EventBusService.publish(new ShutDownEvent(true));
         box.destroy();
+//        cube.destroy();
+        land.destroy();
         display.destroy();
     }
 }
