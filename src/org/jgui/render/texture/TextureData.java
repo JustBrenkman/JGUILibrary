@@ -29,38 +29,15 @@
  *
  */
 
-package org.jgui.render.mesh;
+package org.jgui.render.texture;
 
-import org.jgui.scene.node.appearance.*;
+import java.awt.image.BufferedImage;
 
 /**
- * Created by ben on 26/08/14.
- *
+ * Created by ben on 05/12/14.
+ * <p/>
  * JGUILibrary
  */
-public class Mesh {
-
-    private MeshData mesh;
-
-    private Material material;
-
-    public Mesh() {
-        mesh = new MeshData();
-    }
-
-    public MeshData getMesh() {
-        return mesh;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-       mesh.setMaterial(material);
-    }
-
-    public void destroy() {
-        mesh.getVbo().destroy();
-    }
+public class TextureData extends Texture {
+    public BufferedImage image;
 }

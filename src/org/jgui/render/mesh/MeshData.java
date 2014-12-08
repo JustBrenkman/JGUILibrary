@@ -41,6 +41,8 @@ import java.util.List;
 
 /**
  * Created by ben on 26/08/14.
+ *
+ * JGUILibrary
  */
 public class MeshData {
 
@@ -113,11 +115,11 @@ public class MeshData {
         return ver;
     }
 
-    public void addIndex() {
-
+    public void addIndex(int index) {
+        indecies.add(index);
     }
 
-    public void addIndecies(int[] indexs) {
+    public void addIndecies(int... indexs) {
         for (int i = 0; i < indexs.length; i++) {
             indecies.add(indexs[i]);
         }
@@ -160,6 +162,7 @@ public class MeshData {
             nor[i + 1] = normals.get(i / 4).getY();
             nor[i + 2] = normals.get(i / 4).getZ();
             nor[i + 3] = 0;
+            System.out.println(nor[i] + ", " + nor[i + 1] + ", " + nor[i + 2]);
         }
 
         return nor;

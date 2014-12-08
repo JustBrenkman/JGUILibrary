@@ -31,6 +31,8 @@
 
 package org.jgui.util;
 
+import org.jgui.util.Vector.Vector3f;
+
 /**
  * Created by ben on 11/11/14.
  */
@@ -38,5 +40,24 @@ public enum Axis {
     X_AXIS,
     Y_AXIS,
     Z_AXIS,
-    W_AXIS
+    W_AXIS;
+
+    private static Vector3f x_Axis = new Vector3f(1, 0, 0);
+    private static Vector3f y_Axis = new Vector3f(0, 1, 0);
+    private static Vector3f z_Axis = new Vector3f(0, 0, 1);
+
+    public static Vector3f toVector(Axis axis) {
+        switch (axis) {
+            case X_AXIS:
+                return x_Axis;
+            case Y_AXIS:
+                return y_Axis;
+            case Z_AXIS:
+                return z_Axis;
+            case W_AXIS:
+                return null;
+            default:
+                return null;
+        }
+    }
 }

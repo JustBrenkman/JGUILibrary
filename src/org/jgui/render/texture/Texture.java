@@ -29,38 +29,48 @@
  *
  */
 
-package org.jgui.render.mesh;
+package org.jgui.render.texture;
 
-import org.jgui.scene.node.appearance.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector2f;
 
 /**
- * Created by ben on 26/08/14.
- *
- * JGUILibrary
+ * Created by ben on 04/12/14.
+ * Class contains code for holding textures
  */
-public class Mesh {
+public class Texture {
 
-    private MeshData mesh;
+    private Vector2f size;
 
-    private Material material;
+    private int textureID;
 
-    public Mesh() {
-        mesh = new MeshData();
+    public Texture() {
+        size = new Vector2f();
+        textureID = 0;
+        generateTextureID();
     }
 
-    public MeshData getMesh() {
-        return mesh;
+    public Vector2f getSize() {
+        return size;
     }
 
-    public Material getMaterial() {
-        return material;
+    public void setSize(Vector2f size) {
+        this.size = size;
     }
 
-    public void setMaterial(Material material) {
-       mesh.setMaterial(material);
+    public int getTextureID() {
+        return textureID;
     }
 
-    public void destroy() {
-        mesh.getVbo().destroy();
+    public void setTextureID(int textureID) {
+        this.textureID = textureID;
+    }
+
+    /**
+     * Generates the textureID if textureID doesn't exist
+     */
+    public void generateTextureID() {
+        if (textureID != 0)
+            textureID = GL11.glGenTextures();
     }
 }

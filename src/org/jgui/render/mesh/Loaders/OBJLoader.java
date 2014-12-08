@@ -99,7 +99,6 @@ public class OBJLoader {
 
 
                 String[] currentLine = line.split(" ");
-                if (line.contains("/")) {
                     String[] vertex1 = currentLine[1].split("/");
                     String[] vertex2 = currentLine[2].split("/");
                     String[] vertex3 = currentLine[3].split("/");
@@ -107,15 +106,13 @@ public class OBJLoader {
                     processVertex(vertex1, indecies, normals, vectors, verticies, normalArray, finalNormals);
                     processVertex(vertex2, indecies, normals, vectors, verticies, normalArray, finalNormals);
                     processVertex(vertex3, indecies, normals, vectors, verticies, normalArray, finalNormals);
-                } else {
-                    String vertex1 = currentLine[1];
-                    String vertex2 = currentLine[2];
-                    String vertex3 = currentLine[3];
-
-                    proccessVertexIndecies(vertex1, indecies);
-                    proccessVertexIndecies(vertex2, indecies);
-                    proccessVertexIndecies(vertex3, indecies);
-                }
+//                    String vertex1 = currentLine[1];
+//                    String vertex2 = currentLine[2];
+//                    String vertex3 = currentLine[3];
+//
+//                    proccessVertexIndecies(vertex1, indecies);
+//                    proccessVertexIndecies(vertex2, indecies);
+//                    proccessVertexIndecies(vertex3, indecies);
 
                 line = reader.readLine();
             }
@@ -130,6 +127,7 @@ public class OBJLoader {
 
         for (Vector3f finalNormal : finalNormals) {
             mesh.getMesh().addNormal(finalNormal);
+//            System.out.println("Added Normal");
         }
 
         for (int i = 0; i < indecies.size(); i++) {
@@ -153,7 +151,7 @@ public class OBJLoader {
 //        normalsArray[currentVertexPointer * 3 + 1] = currentNorm.getY();
 //        normalsArray[currentVertexPointer * 3 + 2] = currentNorm.getZ();
 
-//        finalNormals.add(new Vector3f(currentNorm));
+        finalNormals.add(new Vector3f(currentNorm));
 //        System.out.println("Normals:" + currentNorm.toString());
     }
 

@@ -37,6 +37,7 @@ import org.jgui.events.Event;
 import org.jgui.events.ShutDownEvent;
 import org.jgui.util.BlueTooth;
 import org.jgui.util.NXTComm;
+import org.jgui.util.StringColors;
 import org.lwjgl.opengl.GL11;
 import org.jgui.core.JGUI;
 import org.slf4j.Logger;
@@ -76,6 +77,7 @@ public class JGUILibrary {
 //        nxtComm = new Thread(new NXTComm(tooth.openConnection()));
 //        nxtComm.start();
 
+        System.out.println(StringColors.ANSI_BLUE + "Hello to the JGUI Library" + StringColors.ANSI_RESET);
 
         gui.intitialize();
 

@@ -16,6 +16,7 @@
     <orderEntry type="module" module-name="EventBus" />
     <orderEntry type="library" name="bluecove-2.1.0" level="project" />
     <orderEntry type="library" name="bluecove-gpl-2.1.0" level="project" />
+    <orderEntry type="library" name="PNGDecoder" level="project" />
   </component>
 </module>
 

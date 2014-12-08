@@ -29,38 +29,71 @@
  *
  */
 
-package org.jgui.render.mesh;
+package org.jgui.render.texture;
 
-import org.jgui.scene.node.appearance.*;
+import org.lwjgl.opengl.GL11;
 
 /**
- * Created by ben on 26/08/14.
- *
+ * Created by ben on 05/12/14.
+ * <p/>
  * JGUILibrary
  */
-public class Mesh {
+public class TextureProperties {
 
-    private MeshData mesh;
+    private int dstPixelFormat;
 
-    private Material material;
+    private int target;
 
-    public Mesh() {
-        mesh = new MeshData();
+    private int minFilter;
+
+    private int magFilter;
+
+    private static TextureProperties textureProperties;
+
+    public TextureProperties(int dstPixelFormat, int target, int minFilter, int magFilter) {
+        this.dstPixelFormat = dstPixelFormat;
+        this.target = target;
+        this.minFilter = minFilter;
+        this.magFilter = magFilter;
     }
 
-    public MeshData getMesh() {
-        return mesh;
+    public int getDstPixelFormat() {
+        return dstPixelFormat;
     }
 
-    public Material getMaterial() {
-        return material;
+    public void setDstPixelFormat(int dstPixelFormat) {
+        this.dstPixelFormat = dstPixelFormat;
     }
 
-    public void setMaterial(Material material) {
-       mesh.setMaterial(material);
+    public int getTarget() {
+        return target;
     }
 
-    public void destroy() {
-        mesh.getVbo().destroy();
+    public void setTarget(int target) {
+        this.target = target;
+    }
+
+    public int getMinFilter() {
+        return minFilter;
+    }
+
+    public void setMinFilter(int minFilter) {
+        this.minFilter = minFilter;
+    }
+
+    public int getMagFilter() {
+        return magFilter;
+    }
+
+    public void setMagFilter(int magFilter) {
+        this.magFilter = magFilter;
+    }
+
+    public static TextureProperties getDefaultInstance() {
+        if (textureProperties != null)
+            return textureProperties;
+
+            textureProperties = new TextureProperties(GL11.GL_TEXTURE_2D, GL11.GL_RGBA, GL11.GL_LINEAR, GL11.GL_LINEAR);
+            return textureProperties;
     }
 }

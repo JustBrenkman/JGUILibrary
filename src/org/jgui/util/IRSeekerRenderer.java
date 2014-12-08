@@ -293,4 +293,8 @@ public class IRSeekerRenderer {
         smoothMovesS9.update();
         smoothMovesS10.update();
     }
+
+    public void destroy() {
+
+    }
 }

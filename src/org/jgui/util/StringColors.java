@@ -29,38 +29,19 @@
  *
  */
 
-package org.jgui.render.mesh;
-
-import org.jgui.scene.node.appearance.*;
+package org.jgui.util;
 
 /**
- * Created by ben on 26/08/14.
- *
- * JGUILibrary
+ * Created by ben on 24/11/14.
  */
-public class Mesh {
-
-    private MeshData mesh;
-
-    private Material material;
-
-    public Mesh() {
-        mesh = new MeshData();
-    }
-
-    public MeshData getMesh() {
-        return mesh;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-       mesh.setMaterial(material);
-    }
-
-    public void destroy() {
-        mesh.getVbo().destroy();
-    }
+public class StringColors {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
 }

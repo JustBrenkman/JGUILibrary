@@ -189,7 +189,7 @@ public class Quaternion {
         return x * r.getX() + y * r.getY() + z * r.getZ() + w * r.getW();
     }
 
-    public Quaternion NLerp(Quaternion dest, float lerpFactor, boolean shortest)
+    public Quaternion nlerp(Quaternion dest, float lerpFactor, boolean shortest)
     {
         Quaternion correctedDest = dest;
 
@@ -199,7 +199,7 @@ public class Quaternion {
         return correctedDest.subtract(this).multiply(lerpFactor).add(this).normalize();
     }
 
-    public Quaternion SLerp(Quaternion dest, float lerpFactor, boolean shortest)
+    public Quaternion slerp(Quaternion dest, float lerpFactor, boolean shortest)
     {
         final float EPSILON = 1e3f;
 
@@ -213,7 +213,7 @@ public class Quaternion {
         }
 
         if(Math.abs(cos) >= 1 - EPSILON)
-            return NLerp(correctedDest, lerpFactor, false);
+            return nlerp(correctedDest, lerpFactor, false);
 
         float sin = (float)Math.sqrt(1.0f - cos * cos);
         float angle = (float)Math.atan2(sin, cos);
