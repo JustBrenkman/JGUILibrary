@@ -35,22 +35,25 @@ import org.jgui.render.mesh.Mesh;
 import org.jgui.scene.node.Element;
 import org.jgui.util.FPS;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
-import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class OpenGLRenderer implements IRenderer {
 
+    int lastFPS = 0;
     private Logger logger = LoggerFactory.getLogger(OpenGLRenderer.class);
-
     // FPS monitoring
     private FPS fps;
-    int lastFPS = 0;
+
+    public static void clear() {
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     @Override
     public void renderImage() {
@@ -66,8 +69,10 @@ public class OpenGLRenderer implements IRenderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
 
-//        glEnable(GL_CULL_FACE);
-//        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
+        glEnable(GL_TEXTURE_2D);
 
 //        glPointSize(5f);
 //        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
@@ -113,9 +118,11 @@ public class OpenGLRenderer implements IRenderer {
         GL30.glBindVertexArray(mesh.getMesh().getVbo().getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
-        if (mesh.getMesh().getVbo().hasNormals()) {
+        if (mesh.getMesh().getVbo().hasTextureCoords())
             GL20.glEnableVertexAttribArray(2);
-        }
+
+        if (mesh.getMesh().getVbo().hasNormals())
+            GL20.glEnableVertexAttribArray(3);
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getMesh().getVbo().getIndexID());
 
@@ -125,9 +132,12 @@ public class OpenGLRenderer implements IRenderer {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
-        if (mesh.getMesh().getVbo().hasNormals()) {
+
+        if (mesh.getMesh().getVbo().hasTextureCoords())
             GL20.glDisableVertexAttribArray(2);
-        }
+
+        if (mesh.getMesh().getVbo().hasNormals())
+            GL20.glDisableVertexAttribArray(3);
 
         GL30.glBindVertexArray(0);
 
@@ -184,10 +194,6 @@ public class OpenGLRenderer implements IRenderer {
     @Override
     public void clearBuffers() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-
-    public static void clear() {
-        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     @Override

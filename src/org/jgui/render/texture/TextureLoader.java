@@ -33,11 +33,13 @@ package org.jgui.render.texture;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import org.jgui.util.PathManager;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.util.vector.Vector2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -60,9 +62,8 @@ public class TextureLoader {
 
     public Texture getTexture(String name) {
         Texture tex = textures.get(name);
-        if (tex != null) {
+        if (tex != null)
             return tex;
-        }
 
         tex = getTexture(name, TextureProperties.getDefaultInstance());
 
@@ -82,23 +83,38 @@ public class TextureLoader {
         textures.put(name, texture);
     }
 
-    private Texture loadTexture(String filename, TextureProperties textureProperties) {
+    public Texture loadTexture(String filename, TextureProperties textureProperties) {
+
+        Texture texture;
+
+        texture = new Texture(TextureProperties.getDefaultInstance());
 
         try {
-            InputStream in = new FileInputStream(PathManager.getLocationPath() + "resources/textures/" + filename);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            InputStream in = new FileInputStream(PathManager.getLocationPath() + "/resources/textures/" + filename);
             PNGDecoder decoder = new PNGDecoder(in);
 
-            logger.debug("width=" + decoder.getWidth());
-            logger.debug("height=" + decoder.getHeight());
+            logger.info("width=" + decoder.getWidth());
+            logger.info("height=" + decoder.getHeight());
 
             ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
             decoder.decode(byteBuffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
             byteBuffer.flip();
 
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureID());
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+            texture.setSize(new Vector2f(decoder.getWidth(), decoder.getHeight()));
+            textures.put(filename, texture);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return texture;
     }
 }

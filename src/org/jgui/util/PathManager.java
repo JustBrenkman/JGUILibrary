@@ -57,6 +57,7 @@ public class PathManager {
      */
     public static void initialize() {
         // By default, the path should be the code location (where JVE.jar is)
+        getInstance();
         try {
             URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
 
@@ -90,7 +91,7 @@ public class PathManager {
 
     /**
      * Gets the applications main folder path. (Path to folder that holds .jar)
-     * @return
+     * @return Path of the location of the main Jar file
      */
     public static Path getLocationPath() {
         if (codeLocation.toString().contains(".jar")) {

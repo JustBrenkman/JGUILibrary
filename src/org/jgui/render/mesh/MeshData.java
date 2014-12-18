@@ -33,6 +33,7 @@ package org.jgui.render.mesh;
 
 import org.jgui.scene.node.appearance.Material;
 import org.jgui.scene.transform.Vector3fMath;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.awt.*;
@@ -50,9 +51,12 @@ public class MeshData {
     private List<Color> colors = new ArrayList<>();
     private List<Integer> indecies = new ArrayList<>();
     private List<Vector3f> normals = new ArrayList<>();
+    private List<Vector2f> textureCoords = new ArrayList<>();
     private Material material;
 
     private boolean calulateNormals = false;
+
+    private boolean hasTextureCoords = false;
 
     private float[] verticies;
 
@@ -150,10 +154,6 @@ public class MeshData {
         return ver;
     }
 
-    public void setVertices(List<Vector3f> vertices) {
-        this.vertices = vertices;
-    }
-
     public float[] getNormals() {
         float nor[] = new float[normals.size() * 4];
 
@@ -162,10 +162,14 @@ public class MeshData {
             nor[i + 1] = normals.get(i / 4).getY();
             nor[i + 2] = normals.get(i / 4).getZ();
             nor[i + 3] = 0;
-            System.out.println(nor[i] + ", " + nor[i + 1] + ", " + nor[i + 2]);
+//            System.out.println(nor[i] + ", " + nor[i + 1] + ", " + nor[i + 2]);
         }
 
         return nor;
+    }
+
+    public void setNormals(List<Vector3f> normals) {
+        this.normals = normals;
     }
 
     public void addNormals(Vector3f... n) {
@@ -178,10 +182,6 @@ public class MeshData {
         normals.add(n);
     }
 
-    public void setNormals(List<Vector3f> normals) {
-        this.normals = normals;
-    }
-
     public boolean isCalulateNormals() {
         return calulateNormals;
     }
@@ -192,6 +192,10 @@ public class MeshData {
 
     public List<Vector3f> getVertices() {
         return vertices;
+    }
+
+    public void setVertices(List<Vector3f> vertices) {
+        this.vertices = vertices;
     }
 
     public Material getMaterial() {
@@ -213,6 +217,10 @@ public class MeshData {
         } else {
             vbo = new VertexBufferObject(getVerticies(), getColors(), getIndecies());
         }
+
+        if (hasTextureCoords) {
+            vbo.setTextureCoords(getTextureCoords());
+        }
         vbo.createBuffers();
         vbo.uploadBuffer();
     }
@@ -224,6 +232,52 @@ public class MeshData {
     public int vertexCount() {
         return vertices.size() * 2;
     }
+
+    public void addTextureCoord(Vector2f textcoord) {
+        textureCoords.add(textcoord);
+        hasTextureCoords = true;
+    }
+
+    public void addTextureCoord(float u, float v) {
+        textureCoords.add(new Vector2f(u, v));
+        hasTextureCoords = true;
+    }
+
+    public void addTextureCoords(float... w) {
+        for (int i = 0; i < w.length; i += 2) {
+            textureCoords.add(new Vector2f(w[i], w[i + 1]));
+        }
+        hasTextureCoords = true;
+    }
+
+    public void addTextureCoords(Vector2f... w) {
+        for (int i = 0; i < w.length; i++) {
+            textureCoords.add(w[i]);
+        }
+        hasTextureCoords = true;
+    }
+
+
+    public float[] getTextureCoords() {
+        float[] tc = new float[textureCoords.size() * 2];
+
+        for (int i = 0; i < textureCoords.size() * 2; i += 2) {
+            tc[i] = textureCoords.get(i / 2).getX();
+            tc[i + 1] = textureCoords.get(i / 2).getY();
+
+//            System.out.println(tc[i] + ", " + tc[i + 1]);
+        }
+
+        for (int i = 0; i < textureCoords.size(); i++) {
+
+        }
+
+        return tc;
+    }
+
+//    public List<Vector2f> getTextureCoords() {
+//        return textureCoords;
+//    }
 
     public void calulateNormals() {
 

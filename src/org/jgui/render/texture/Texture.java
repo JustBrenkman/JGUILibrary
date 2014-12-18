@@ -31,7 +31,9 @@
 
 package org.jgui.render.texture;
 
+import org.jgui.util.StringColors;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
@@ -44,10 +46,30 @@ public class Texture {
 
     private int textureID;
 
-    public Texture() {
+    private TextureProperties textureProperties;
+
+    public Texture(TextureProperties textureProperties) {
         size = new Vector2f();
         textureID = 0;
+        this.textureProperties = textureProperties;
         generateTextureID();
+    }
+
+    public static void unbind(TextureProperties textureProperties) {
+        if (textureProperties != null) {
+            GL11.glBindTexture(textureProperties.getTarget(), 0);
+        } else {
+            StringColors.printl(StringColors.ANSI_RED, "Texture properties are null!");
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+        }
+    }
+
+    public TextureProperties getTextureProperties() {
+        return textureProperties;
+    }
+
+    public void setTextureProperties(TextureProperties textureProperties) {
+        this.textureProperties = textureProperties;
     }
 
     public Vector2f getSize() {
@@ -70,7 +92,24 @@ public class Texture {
      * Generates the textureID if textureID doesn't exist
      */
     public void generateTextureID() {
-        if (textureID != 0)
             textureID = GL11.glGenTextures();
+    }
+
+    public void bind() {
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        if (textureProperties != null) {
+            // TODO use the TextureProperties.getTarget() Method
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+        } else {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+        }
+    }
+
+    public void unbind() {
+        if (textureProperties != null) {
+            GL11.glBindTexture(textureProperties.getTarget(), 0);
+        } else {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+        }
     }
 }

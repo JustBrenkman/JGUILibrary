@@ -33,7 +33,9 @@ package org.jgui.render;
 
 import org.jgui.util.PathManager;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -49,21 +51,14 @@ import java.util.HashMap;
  */
 public class Shader {
 
-    private int vertexShaderID;
-
-    private int fragmentShaderID;
-
-    private int geometryShaderID;
-
-    private int programID;
-
-    private String vertexShaderLocation;
-
-    private String fragmentShaderLocation;
-
-    private String geometryShaderLocation;
-
     public HashMap<String, Integer> uniforms;
+    private int vertexShaderID;
+    private int fragmentShaderID;
+    private int geometryShaderID;
+    private int programID;
+    private String vertexShaderLocation;
+    private String fragmentShaderLocation;
+    private String geometryShaderLocation;
 
     public Shader() {
         uniforms = new HashMap<>();
@@ -173,6 +168,10 @@ public class Shader {
         value.store(matrixBuffer);
         matrixBuffer.flip();
         GL20.glUniformMatrix4(uniforms.get(name), false, matrixBuffer);
+    }
+
+    public void updateSampler2D(String name, int id) {
+        GL20.glUniform1i(uniforms.get(name), id);
     }
 
     public void bind() {

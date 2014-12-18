@@ -34,11 +34,13 @@ package org.jgui.core;
 import org.jgui.eventbus.EventBusService;
 import org.jgui.events.ShutDownEvent;
 import org.jgui.render.DisplayManager;
-import org.jgui.render.mesh.Loaders.OBJLoader;
-import org.jgui.render.mesh.Mesh;
 import org.jgui.render.IRenderer;
 import org.jgui.render.OpenGLRenderer;
 import org.jgui.render.Shader;
+import org.jgui.render.mesh.Mesh;
+import org.jgui.render.texture.Texture;
+import org.jgui.render.texture.TextureLoader;
+import org.jgui.render.texture.TextureProperties;
 import org.jgui.scene.geometry.Line;
 import org.jgui.scene.node.appearance.Material;
 import org.jgui.scene.transform.Transform;
@@ -55,6 +57,8 @@ public class JGUI {
 
     private OpenGLRenderer renderer;
 
+    private TextureLoader textureLoader;
+
     public JGUI() {
         display = new DisplayManager();
 
@@ -62,6 +66,8 @@ public class JGUI {
 
         PathManager.getInstance();
         PathManager.initialize();
+
+        textureLoader = new TextureLoader();
     }
 
     public void intitialize() {
@@ -93,6 +99,7 @@ public class JGUI {
      * Calls render methods
      */
     public void start() {
+
         mainLoop();
     }
 
@@ -119,6 +126,19 @@ public class JGUI {
         shader.addUniform("light_Pos");
         shader.addUniform("light_Col");
         shader.addUniform("color");
+
+        Shader textureShader = new Shader("Experimental/Light/Texture/vs.glsl", "Experimental/Light/Texture/fs.glsl");
+//        Shader textureShader = new Shader("Experimental/Light/vs.glsl", "Experimental/Light/fs.glsl");
+        textureShader.loadShaders();
+        textureShader.compile();
+
+        textureShader.addUniform("modelMatrix");
+        textureShader.addUniform("projectionMatrix");
+        textureShader.addUniform("viewMatrix");
+        textureShader.addUniform("light_Pos");
+        textureShader.addUniform("light_Col");
+        textureShader.addUniform("color");
+        textureShader.addUniform("tex");
 
         Mesh box = new Mesh();
         box.getMesh().addVerticies(new Vector3f(-0.5f, -0.5f, 0.5f), new Vector3f(0.5f, -0.5f, 0.5f), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(-0.5f, 0.5f, 0.5f), // Front
@@ -152,17 +172,20 @@ public class JGUI {
         Mesh plane = new Mesh();
         plane.getMesh().addVerticies(new Vector3f(-10, 0, 10), new Vector3f(10, 0, 10), new Vector3f(10, 0, -10), new Vector3f(-10, 0, -10));
         plane.getMesh().addNormals(new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0), new Vector3f(0, 1, 0));
+//        plane.getMesh().addTextureCoords(0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1);
+        plane.getMesh().addTextureCoords(new Vector2f(0, 0), new Vector2f(1, 0), new Vector2f(1, 1), new Vector2f(0, 1));
         plane.getMesh().setCalulateNormals(true);
-        Material plane_Material = new Material(Color.RED);
+        Material plane_Material = new Material(new Color(0, 0, 0, 255));
         plane.setMaterial(plane_Material);
         int[] indecies = {0, 1, 2, 0, 2, 3};
         plane.getMesh().addIndecies(indecies);
-//        plane.getMesh().compile();
+        plane.getMesh().setCalulateNormals(true);
+        plane.getMesh().compile();
 
         float rot = 0;
 
 
-        Vector3f lightPos = new Vector3f(-20, 0, 0);
+        Vector3f lightPos = new Vector3f(-20, 10, 0);
         Vector3f lightCol = new Vector3f(1, 1, 1);
 
         Line line = new Line(new Vector3f(0, -100, 0), new Vector3f(0, 100, 0), new Material(Color.GREEN));
@@ -171,6 +194,8 @@ public class JGUI {
         line1.build();
         Line line2 = new Line(new Vector3f(0, 0, -100), new Vector3f(0, 0, 100), new Material(Color.RED));
         line2.build();
+
+        Texture text = textureLoader.loadTexture("redwhite.png", TextureProperties.getDefaultInstance());
 
         /**
          * main loop
@@ -250,22 +275,37 @@ public class JGUI {
 
             renderer.renderMesh(box, shader);
 
+            textureShader.bind();
+            planeTransform.updateTransformation();
+            textureShader.updateUniformMatrix4("modelMatrix", planeTransform.getModelMatrix());
+            textureShader.updateUniformMatrix4("projectionMatrix", camera.getProjectionMatrix());
+            textureShader.updateUniformMatrix4("viewMatrix", camera.getViewMatrix());
+            textureShader.updateUniformVector3f("light_Pos", lightPos);
+            textureShader.updateUniformVector3f("light_Col", lightCol);
+            textureShader.updateSampler2D("tex", 0);
+            textureShader.unBind();
 
-            line.render(camera, renderer);
-            line1.render(camera, renderer);
-            line2.render(camera, renderer);
+            text.bind();
+            renderer.renderMesh(plane, textureShader);
+            text.unbind();
+
+
+//            line.render(camera, renderer);
+//            line1.render(camera, renderer);
+//            line2.render(camera, renderer);
 
             // Reset the Camera up for Orthographics
             camera.getTransform().updateTransformation();
 
             // Render 2D stuff here
-            irSeekerRenderer.render();
+//            irSeekerRenderer.render();
 
             display.update();
         }
 
         EventBusService.publish(new ShutDownEvent(true));
         box.destroy();
+        plane.destroy();
         display.destroy();
     }
 }

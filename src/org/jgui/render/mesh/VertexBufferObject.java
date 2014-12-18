@@ -31,10 +31,13 @@
 
 package org.jgui.render.mesh;
 
+import org.jgui.util.StringColors;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -51,6 +54,8 @@ public class VertexBufferObject {
 
     private float[] normals;
 
+    private float[] textureCoords;
+
     private int vboID;
 
     private int cboID;
@@ -59,9 +64,9 @@ public class VertexBufferObject {
 
     private int nboID;
 
-    private int vaoID;
+    private int tboID;
 
-    private int indexID;
+    private int vaoID;
 
     private FloatBuffer vertexBuffer;
 
@@ -71,7 +76,11 @@ public class VertexBufferObject {
 
     private FloatBuffer normalBuffer;
 
+    private FloatBuffer textureBuffer;
+
     private boolean hasNormals = false;
+
+    private boolean hasTextureCoords = false;
 
     // Random Coolness buffer ID
     private int rcoID;
@@ -86,6 +95,9 @@ public class VertexBufferObject {
         this(vertices, colors, indecies);
         setNormals(normals);
         setHasNormals(true);
+    }
+
+    public VertexBufferObject() {
     }
 
     public VertexBufferObject(float[] vertices) {
@@ -144,6 +156,23 @@ public class VertexBufferObject {
         this.hasNormals = hasNormals;
     }
 
+    public float[] getTextureCoords() {
+        return textureCoords;
+    }
+
+    public void setTextureCoords(float[] textureCoords) {
+        this.textureCoords = textureCoords;
+        hasTextureCoords = true;
+    }
+
+    public boolean hasTextureCoords() {
+        return hasTextureCoords;
+    }
+
+    public void setHasTextureCoords(boolean hasTextureCoords) {
+        this.hasTextureCoords = hasTextureCoords;
+    }
+
     public void createBuffers() {
         vertexBuffer = BufferUtils.createFloatBuffer(vertices.length);
         vertexBuffer.put(getVertices());
@@ -161,6 +190,13 @@ public class VertexBufferObject {
             normalBuffer = BufferUtils.createFloatBuffer(normals.length);
             normalBuffer.put(getNormals());
             normalBuffer.flip();
+        }
+
+        if (hasTextureCoords) {
+            StringColors.printl(StringColors.ANSI_CYAN, "Has texture coords");
+            textureBuffer = BufferUtils.createFloatBuffer(textureCoords.length);
+            textureBuffer.put(textureCoords);
+            textureBuffer.flip();
         }
     }
 
@@ -195,15 +231,24 @@ public class VertexBufferObject {
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
+        if (hasTextureCoords) {
+            tboID = GL15.glGenBuffers();
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, tboID);
+            GL15.glBufferData(GL15.GL_ARRAY_BUFFER, textureBuffer, GL15.GL_STATIC_DRAW);
+
+            GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 0, 0);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        }
+
         if (hasNormals) {
             nboID = GL15.glGenBuffers();
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, nboID);
             GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalBuffer, GL15.GL_STATIC_DRAW);
 
-            GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
+            GL20.glVertexAttribPointer(3, 4, GL11.GL_FLOAT, false, 0, 0);
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-            GL30.glBindVertexArray(0);
+//            GL30.glBindVertexArray(0);
         }
 
         // Bind to buffer 0
@@ -224,10 +269,14 @@ public class VertexBufferObject {
         GL30.glBindVertexArray(vaoID);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glDeleteBuffers(vboID);
         GL15.glDeleteBuffers(cboID);
+        GL15.glDeleteBuffers(tboID);
+        GL15.glDeleteBuffers(nboID);
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL15.glDeleteBuffers(iboID);

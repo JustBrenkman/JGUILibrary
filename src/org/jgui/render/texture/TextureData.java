@@ -40,4 +40,8 @@ import java.awt.image.BufferedImage;
  */
 public class TextureData extends Texture {
     public BufferedImage image;
+
+    public TextureData(TextureProperties textureProperties) {
+        super(textureProperties);
+    }
 }
